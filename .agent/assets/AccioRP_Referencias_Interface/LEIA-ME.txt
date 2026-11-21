@@ -1,0 +1,4 @@
+Estrutura de pastas para referencias de interface de Hogwarts Legacy.
+Fonte: https://interfaceingame.com/games/hogwards-legacy/
+ATENCAO: imagens nao incluidas: o ambiente nao conseguiu transferir os ficheiros do site.
+As capturas sao referencias visuais, nao assets editaveis.

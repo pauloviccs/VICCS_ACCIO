@@ -3,22 +3,20 @@
 ## Status: 🏗️ EM ANDAMENTO
 
 ## Fase Atual
-**Fase 0 — Construção da Biblioteca de Contexto**
+**Fase 1.1 — Website de Pré-Registro & Whitelist (Discord + Supabase + IDV)**
 
-Estamos criando toda a infraestrutura de conhecimento (.agent cortex) antes de
-iniciar o desenvolvimento de qualquer código do servidor.
+Estamos projetando e implementando a aplicação web oficial de pré-lançamento do servidor VICCS Accio.
+O foco é retenção máxima, FOMO e pré-cadastro com ficha detalhada de personagem (história de no mínimo 3.000 palavras).
 
 ## O que está sendo feito
-- [x] Pesquisa do framework Arcane MP e documentação
-- [x] Mapeamento da arquitetura (architecture.md)
-- [x] Definição do stack tecnológico (stack.md)
-- [x] Schema de banco de dados inicial (database_schema.md)
-- [x] Code Style Guide (code_style.md)
-- [x] UI/UX Guidelines (ui_ux.md)
-- [x] Convenções de Resources (resource_conventions.md)
-- [x] Skills de desenvolvimento
-- [x] Planos de implementação
-- [x] PROJECT_STATUS.md
+- [x] Extração de tokens da IDV oficial (.agent/assets/IDV_Logo)
+- [x] Mapeamento dos requisitos do Arcane MP (hmp-core / hmp-characters)
+- [x] Conexão e inspeção com o Supabase MCP
+- [x] Elaboração do Plano de Implementação (website-preregistration-plan.md)
+- [ ] Execução do Protocolo de 12 Perguntas
+- [ ] Criação do schema SQL no Supabase
+- [ ] Desenvolvimento do Website/Webapp na pasta `website/`
+- [ ] Validação responsiva e entrega
 
 ## Próximos Passos
 - Fase 1: Instalação e configuração do servidor Arcane MP

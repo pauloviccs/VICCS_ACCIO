@@ -3,20 +3,23 @@
 ## Status: 🏗️ EM ANDAMENTO
 
 ## Fase Atual
-**Fase 1.1 — Website de Pré-Registro & Whitelist (Discord + Supabase + IDV)**
+**Fase 1.2 — Carta de Hogwarts 3D, Zero Placeholders & Discord Gate**
 
-Estamos projetando e implementando a aplicação web oficial de pré-lançamento do servidor VICCS Accio.
-O foco é retenção máxima, FOMO e pré-cadastro com ficha detalhada de personagem (história de no mínimo 3.000 palavras).
+Estamos aprimorando a aplicação de pré-registro com base no feedback crítico:
+1. Remoção de todos os dados fictícios/placeholders do front-end.
+2. Criação do modal interativo da Carta de Hogwarts abrindo em perspectiva 3D na primeira visita.
+3. Pré-registro estritamente condicionado ao login com Discord.
+4. Supabase com tabelas ativas e auditadas em ambos os projetos.
 
 ## O que está sendo feito
-- [x] Extração de tokens da IDV oficial (.agent/assets/IDV_Logo)
-- [x] Mapeamento dos requisitos do Arcane MP (hmp-core / hmp-characters)
-- [x] Conexão e inspeção com o Supabase MCP
-- [x] Elaboração do Plano de Implementação (website-preregistration-plan.md)
+- [x] Schema do Supabase auditado e sincronizado em ambos os projetos via MCP
+- [x] Criação do plano atualizado (hogwarts-letter-and-clean-discord-plan.md)
+- [x] Atualização da especificação no Canvas (website-design-spec.md)
 - [ ] Execução do Protocolo de 12 Perguntas
-- [ ] Criação do schema SQL no Supabase
-- [ ] Desenvolvimento do Website/Webapp na pasta `website/`
-- [ ] Validação responsiva e entrega
+- [ ] Implementação do componente `HogwartsLetterModal.tsx`
+- [ ] Limpeza total de placeholders no código do front-end
+- [ ] Validação do fluxo de autenticação e persistência real
+- [ ] Build e push para o repositório
 
 ## Próximos Passos
 - Fase 1: Instalação e configuração do servidor Arcane MP

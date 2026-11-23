@@ -76,3 +76,4 @@ Isolated 3D game asset icon of a magical wand handle, [NOME_DA_FAMÍLIA], [CORES
 1. **Sem Estética Moderna:** Nenhuma varinha pode ter elementos tecnológicos, luzes neon de LED, plástico, fibra de carbono ou formatos de sabre de luz. Tudo deve remeter a marcenaria fina, metalurgia vitoriana/medieval e alquimia.
 2. **Proporções Ergonômicas:** O cabo possui entre 3.5 e 4.5 polegadas (aproximadamente 9 a 11.5 cm), permitindo uma pegada confortável de mão única, enquanto o comprimento total da varinha varia de 9½ a 14½ polegadas.
 3. **Pátina de Uso:** Materiais mágicos têm história; os metais devem apresentar pátina sutil nos recessos e brilho polido nas cristas onde os dedos do bruxo repousam.
+

@@ -61,25 +61,76 @@ beast_collection (id, character_id, beast_type, name, bonding_level, captured_at
 vivarium_state (character_id, vivarium_id, layout_data)
 ```
 
-### 2. Supabase PostgreSQL (Plataforma)
+### 2. Supabase PostgreSQL (Plataforma — ACCIO_Rp)
 
-Usado pelo website, painel admin web, e serviços externos.
+> **Projeto Oficial:** `ACCIO_Rp` (ID/Ref: `siwjyavftankitbdagzo`)  
+> **Organização:** `VICCS` (`viccssupabase0@gmail.com`)  
+> **Região:** `sa-east-1` (São Paulo, Brasil) | **PostgreSQL:** 17.12
+
+Usado pela plataforma web para pré-registro de pioneiros, admissão ministerial, gerenciamento de permissões RBAC, sincronização em tempo real e armazenamento de documentos em PDF.
+
+#### Tabelas de Produção Ativas
 
 ```sql
--- Perfis públicos (ligados ao Supabase Auth)
-profiles (id, user_id, display_name, avatar_url, linked_account_id)
+-- 1. Candidaturas de Whitelist & Criação de Personagem
+CREATE TABLE public.character_applications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    discord_id TEXT NOT NULL,
+    discord_username TEXT NOT NULL,
+    discord_avatar TEXT,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    birth_date TEXT NOT NULL,
+    birth_place TEXT NOT NULL,
+    blood_status TEXT NOT NULL,       -- 'pure-blood', 'half-blood', 'muggle-born'
+    preferred_house TEXT NOT NULL,    -- 'gryffindor', 'slytherin', 'ravenclaw', 'hufflepuff'
+    wand_wood TEXT NOT NULL,
+    wand_core TEXT NOT NULL,          -- Pena de Fênix, Fibra de Coração de Dragão, etc.
+    wand_length TEXT NOT NULL,        -- Ex: 11 polegadas
+    wand_flexibility TEXT NOT NULL,   -- Flexível, Firme, Rígida, etc.
+    wand_handle TEXT NOT NULL,        -- 11 famílias canônicas de Hogwarts Legacy
+    patronus TEXT,
+    character_backstory TEXT NOT NULL,-- Mínimo 3.000 palavras
+    word_count INTEGER NOT NULL DEFAULT 0,
+    rp_experience TEXT,
+    rules_accepted BOOLEAN NOT NULL DEFAULT true,
+    status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'approved', 'rejected'
+    reviewer_notes TEXT,
+    reviewed_by TEXT,
+    pdf_url TEXT                      -- Link público do pergaminho em PDF
+);
 
--- Logs e analytics
-server_logs (id, event_type, actor, details, timestamp)
-player_sessions (id, account_id, connected_at, disconnected_at, duration)
+-- 2. Configurações Globais & Realtime (Cronômetro Apple, Fases)
+CREATE TABLE public.accio_settings (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+-- Chaves padrão: 'countdown_timer' (target_date, days, hours, minutes, seconds)
 
--- Conteúdo do Website
-news_posts (id, title, content, author_id, published_at, featured)
-server_rules (id, category, content, version, updated_at)
-
--- Aplicações de Whitelist (se aplicável)
-whitelist_applications (id, user_id, character_name, backstory, status, reviewed_by)
+-- 3. Controle de Acesso Baseado em Cargos (RBAC)
+CREATE TABLE public.user_roles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    discord_id TEXT NOT NULL UNIQUE,
+    discord_username TEXT NOT NULL,
+    discord_avatar TEXT,
+    role TEXT NOT NULL DEFAULT 'user', -- 'user', 'student', 'mod', 'admin', 'super_admin'
+    assigned_by TEXT DEFAULT 'Sistema'
+);
 ```
+
+#### Storage Buckets (Supabase Storage)
+
+* **`character_sheets`** (Público, limite de 10 MB, tipos permitidos: `application/pdf`): Armazena as fichas de matrícula geradas em PDF estilo pergaminho envelhecido, permitindo download tanto pelos alunos quanto pela moderação.
+
+#### Segurança (RLS) & Publicações Realtime
+
+* **RLS Ativo:** Políticas configuradas para leitura pública de contadores e submissão segura de candidaturas.
+* **Publicação `supabase_realtime`:** Ativa para `accio_settings`, `user_roles` e `character_applications`, garantindo atualização instantânea via WebSockets para todos os clientes conectados quando um admin ajusta o cronômetro ou altera um status.
 
 ## Convenções
 

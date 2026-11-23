@@ -1,74 +1,100 @@
-# 🏰 VICCS Accio — Hogwarts Legacy RP Server
+# 🏰 VICCS Accio — Hogwarts Legacy Roleplay Server
 
-> Servidor de Roleplay MMO-RPG no universo de Hogwarts Legacy, construído sobre o framework [Arcane MP](https://arcane.mp/).
+> Servidor de Roleplay MMO-RPG imersivo ambientado no universo de Hogwarts Legacy nos anos 2000, desenvolvido sobre o framework [Arcane MP](https://arcane.mp/).
+
+---
 
 ## ⚡ Visão Geral
 
-O **VICCS Accio** transforma Hogwarts Legacy em uma experiência multiplayer persistente com mecânicas customizadas que ultrapassam o jogo original. Um ecossistema modular de scripts que se comunicam como um organismo vivo, criando um mundo mágico imersivo para roleplay.
+O **VICCS Accio** transforma *Hogwarts Legacy* em uma experiência multiplayer persistente de alta fidelidade com mecânicas customizadas que ultrapassam o jogo original. Uma infraestrutura viva que une o framework de rede **Arcane MP (C++ / Node.js)** a uma plataforma web moderna integrada ao **Supabase** e ao **Discord** para admissão, whitelist ministerial e gestão em tempo real.
 
-## 🧙 Features Planejadas
+---
+
+## 🌐 Plataforma Web de Pré-Registro & Admissão
+
+A pasta [`website/`](website/) hospeda a aplicação oficial de convocação de pioneiros do servidor:
+
+* **Carta de Hogwarts 3D:** Abertura tridimensional e lúdica da carta de convocação de Hogwarts lacrada a cera.
+* **Criação de Personagem Padrão Hogwarts Legacy:**
+  * Catálogo de 11 famílias de cabos de varinhas recortadas em canal alfa transparente via visão computacional (OpenCV).
+  * Pedestal cinematográfico com visualização dupla: **[🪄 3D Macro]** e **[📜 Guia de Campo]** (pergaminho do século XIX).
+  * Seletores canônicos de dormitórios (`Bruxo/Wizard` vs `Bruxa/Witch`), linhagens arcanas e os Três Grandes Núcleos de Garrick Ollivanders.
+  * Validador dinâmico de crônica de personagem com meta mínima de 3.000 palavras.
+* **Motor Dinâmico de Temas das Quatro Casas:** Transição de cores fluida em 0.8s (Grifinória, Sonserina, Corvinal e Lufa-Lufa) acionada pelas bandeiras, navbar ou ficha, sincronizada via `localStorage` e perfil Discord.
+* **Estandartes 3D das Quatro Casas:** Renderização tridimensional em Three.js com física física de tecidos e iluminação medieval.
+* **Ficha de Matrícula em Pergaminho (PDF):** Geração de documento de época estilizado com brasão oficial, dados heráldicos da varinha e sincronização automática com o Supabase Storage (`character_sheets`).
+* **Cronômetro Apple Responsivo:** Modal inspirado no iOS com animação suave de roleta para contagem regressiva de 60 dias de pré-registro com suporte a Realtime WebSockets.
+* **Integração Discord & Supabase:** Autenticação OAuth2, webhook com Rich Embeds diagramados e controle de acesso RBAC (`user`, `student`, `mod`, `admin`, `super_admin`).
+
+---
+
+## 🧙 Features Planejadas para o Servidor
 
 | Sistema | Descrição |
-|---------|-----------|
-| 🪄 Magias | Sistema expandido com magias customizadas, mastery e combos |
-| 📚 Aulas | Progressão acadêmica com matérias, aulas e exames |
-| 💰 Economia | Galeões/Sicles/Knuts com lojas, comércio e anti-inflação |
-| 📜 Quests | Missões dinâmicas, chains, dailies e eventos sazonais |
-| 🤖 NPCs | Personagens com IA, schedules e diálogos interativos |
-| 🦅 Criaturas | Captura, domesticação, vivário e habilidades únicas |
-| ⚗️ Crafting | Poções, herbologia, encantamentos e alquimia avançada |
-| 🏠 Habitações | Casas de jogadores com decoração e manutenção |
-| 💬 Social | Chat RP com alcance, emotes, correio owl |
-| ⚔️ Combate | PvP e PvE expandido com duelos formais |
-| 🛡️ Admin | Moderação avançada com anti-cheat server-side |
+| :--- | :--- |
+| 🪄 **Magias** | Sistema expandido com feitiços canônicos e originais, maestria gradual e combos de duelo. |
+| 📚 **Aulas & Casas** | Progressão acadêmica com matérias, tarefas em sala, exames N.O.M.s e Taça das Casas. |
+| 💰 **Economia Viva** | Moedas do mundo bruxo (Galeões, Sicles, Knuts), lojas no Beco Diagonal e Hogsmeade. |
+| 📜 **Quests Dinâmicas** | Missões com narrativa ramificada, eventos mundiais sazonais e ocorrências do Ministério. |
+| 🤖 **NPCs & IA** | Personagens vivos com rotinas de dia/noite, memórias e diálogos contextuais. |
+| 🦅 **Criaturas Mágicas** | Resgate, cuidados em vivário, vínculo mágico e montarias aladas. |
+| ⚗️ **Herbologia & Poções** | Minigames de caldeirão, cultivo de plantas raras e alquimia avançada. |
+| 🏠 **Acomodações** | Quartos comunais por Casa e propriedades residenciais customizáveis. |
+| 💬 **Voz de Proximidade 3D** | Comunicação por voz espacializada (Opus), sussurros, eco em masmorras e correio coruja. |
+| 🛡️ **Segurança & Anti-Cheat** | Servidor 100% autoritativo em Node.js com validação de inventário, feitiços e movimentação. |
 
-## 🏗️ Arquitetura
+---
 
+## 🏗️ Arquitetura Técnica
+
+```text
+┌────────────────────────────────────────────────────────┐
+│               VICCS ACCIO ROLEPLAY SERVER              │
+├───────────────────────────┬────────────────────────────┤
+│   Arcane MP (C++ Core)    │    Plataforma Web (React)  │
+│   Node.js (Server Scripts)│    Vite 6 + Tailwind CSS   │
+│   V8 Sandboxed (Clients)  │    Three.js + jsPDF        │
+├───────────────────────────┼────────────────────────────┤
+│   MySQL / MariaDB         │    Supabase Cloud          │
+│   (Persistência Gameplay) │    (ACCIO_Rp / Realtime)   │
+└───────────────────────────┴────────────────────────────┘
 ```
-┌──────────────────────────────────────────┐
-│          Arcane MP (MafiaHub C++)         │
-├──────────────────────────────────────────┤
-│  Server (Node.js)  │  Client (V8 + CEF)  │
-├──────────────────────────────────────────┤
-│  MySQL/MariaDB     │  Supabase           │
-└──────────────────────────────────────────┘
-```
 
-## 📁 Estrutura do Projeto
+---
 
-```
+## 📁 Estrutura de Diretórios
+
+```text
 VICCS_Accio_HL_Server/
-├── .agent/              # Cérebro do projeto (contexto, skills, guidelines)
-├── server/              # Servidor Arcane MP e resources
-├── supabase/            # Backend da plataforma (Auth, Storage, DB)
-└── website/             # Website público do servidor
+├── .agent/              # Cortex do Projeto (Contexto, Memória, Skills e Diretrizes)
+├── scripts/             # Scripts de automação, processamento de assets e migração SQL
+├── server/              # (Fase 1) Servidor Arcane MP e resources de gameplay
+├── supabase/            # Configurações locais da CLI do Supabase
+└── website/             # Aplicação web React do pré-registro oficial
 ```
 
-## 🗺️ Fase Atual
+---
 
-**Fase 0 — Biblioteca de Contexto** ✅ Completa
+## 📖 Documentação & Governança
 
-Próximo: **Fase 1 — Setup do Servidor e Infraestrutura**
+Toda a documentação técnica, regras de arquitetura e procedimentos operacionais residem na pasta [`.agent/`](.agent/):
 
-## 📖 Documentação
+* [Visão Geral & Status Atual](.agent/overview/PROJECT_STATUS.md)
+* [Arquitetura do Servidor](.agent/context/architecture.md)
+* [Stack Tecnológico](.agent/context/stack.md)
+* [Schema de Banco de Dados](.agent/context/database_schema.md)
+* [Guia de Estilo de Código](.agent/guidelines/code_style.md)
+* [Diretrizes de UI/UX](.agent/guidelines/ui_ux.md)
+* [Artesão de Varinhas (Skill)](.agent/skills/wand-asset-artisan.md)
 
-Toda a documentação técnica está na pasta `.agent/`:
+---
 
-- [Arquitetura](.agent/context/architecture.md)
-- [Stack Tecnológico](.agent/context/stack.md)
-- [Database Schema](.agent/context/database_schema.md)
-- [Code Style Guide](.agent/guidelines/code_style.md)
-- [UI/UX Guidelines](.agent/guidelines/ui_ux.md)
-- [Resource Conventions](.agent/guidelines/resource_conventions.md)
-- [Plano de Implementação](.agent/implementation-plans/master-plan.md)
+## 🔗 Repositórios Oficiais
 
-## 🔗 Links Importantes
-
-- [Arcane MP](https://arcane.mp/) — Framework multiplayer
-- [Arcane MP Docs](https://docs.arcane.mp/) — Documentação oficial
-- [Arcane MP GitHub](https://github.com/arcane-mp) — Repositórios oficiais
+* **Monorepo do Servidor:** [https://github.com/pauloviccs/VICCS_ACCIO.git](https://github.com/pauloviccs/VICCS_ACCIO.git)
+* **Website Standalone:** [https://github.com/pauloviccs/accio_rp_website.git](https://github.com/pauloviccs/accio_rp_website.git)
+* **Framework:** [Arcane MP](https://arcane.mp/)
 
 ---
 
 *VICCS Accio — Accio, Aventura!* 🪄
-

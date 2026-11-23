@@ -1,0 +1,154 @@
+-- ========================================================
+-- ACCIO ROLEPLAY (ARCANE MP) — DATABASE MIGRATION SCRIPT
+-- Projeto: ACCIO_Rp (Ref: siwjyavftankitbdagzo)
+-- ========================================================
+
+-- 1. EXTENSIONS
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- 2. TABELA character_applications
+CREATE TABLE IF NOT EXISTS public.character_applications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    discord_id TEXT NOT NULL,
+    discord_username TEXT NOT NULL,
+    discord_avatar TEXT,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    birth_date TEXT NOT NULL,
+    birth_place TEXT NOT NULL,
+    blood_status TEXT NOT NULL,
+    preferred_house TEXT NOT NULL,
+    wand_wood TEXT NOT NULL,
+    wand_core TEXT NOT NULL,
+    wand_length TEXT NOT NULL,
+    wand_flexibility TEXT NOT NULL,
+    wand_handle TEXT NOT NULL,
+    patronus TEXT,
+    character_backstory TEXT NOT NULL,
+    word_count INTEGER NOT NULL DEFAULT 0,
+    rp_experience TEXT,
+    rules_accepted BOOLEAN NOT NULL DEFAULT true,
+    status TEXT NOT NULL DEFAULT 'pending',
+    reviewer_notes TEXT,
+    reviewed_by TEXT,
+    pdf_url TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_character_applications_discord_id ON public.character_applications(discord_id);
+CREATE INDEX IF NOT EXISTS idx_character_applications_status ON public.character_applications(status);
+CREATE INDEX IF NOT EXISTS idx_character_applications_created_at ON public.character_applications(created_at DESC);
+
+-- 3. TABELA accio_settings (Cronômetro Apple, Fases & Configs em Realtime)
+CREATE TABLE IF NOT EXISTS public.accio_settings (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+INSERT INTO public.accio_settings (key, value, updated_at)
+VALUES (
+    'countdown_timer',
+    '{"target_date": "2027-01-21T23:59:59.000Z", "days": 60, "hours": 0, "minutes": 0, "seconds": 0, "updated_by": "Ministério da Magia"}'::jsonb,
+    now()
+)
+ON CONFLICT (key) DO NOTHING;
+
+-- 4. TABELA user_roles (RBAC: user, student, mod, admin, super_admin)
+CREATE TABLE IF NOT EXISTS public.user_roles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    discord_id TEXT NOT NULL UNIQUE,
+    discord_username TEXT NOT NULL,
+    discord_avatar TEXT,
+    role TEXT NOT NULL DEFAULT 'user',
+    assigned_by TEXT DEFAULT 'Sistema'
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_roles_discord_id ON public.user_roles(discord_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_role ON public.user_roles(role);
+
+-- Super admin padrão PauloViccs
+INSERT INTO public.user_roles (discord_id, discord_username, role, assigned_by)
+VALUES 
+    ('1466833236213891085', 'pauloviccs', 'super_admin', 'Fundador'),
+    ('149567984597466064', 'pauloviccs', 'super_admin', 'Fundador')
+ON CONFLICT (discord_id) DO UPDATE SET role = 'super_admin';
+
+-- 5. STORAGE BUCKET PARA FICHAS EM PDF
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+    'character_sheets',
+    'character_sheets',
+    true,
+    10485760,
+    ARRAY['application/pdf']
+)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- 6. ROW LEVEL SECURITY (RLS)
+ALTER TABLE public.character_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.accio_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read applications" ON public.character_applications;
+CREATE POLICY "Public read applications" ON public.character_applications FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public insert applications" ON public.character_applications;
+CREATE POLICY "Public insert applications" ON public.character_applications FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public update applications" ON public.character_applications;
+CREATE POLICY "Public update applications" ON public.character_applications FOR UPDATE USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public read settings" ON public.accio_settings;
+CREATE POLICY "Public read settings" ON public.accio_settings FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public upsert settings" ON public.accio_settings;
+CREATE POLICY "Public upsert settings" ON public.accio_settings FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public read user_roles" ON public.user_roles;
+CREATE POLICY "Public read user_roles" ON public.user_roles FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public insert user_roles" ON public.user_roles;
+CREATE POLICY "Public insert user_roles" ON public.user_roles FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public update user_roles" ON public.user_roles;
+CREATE POLICY "Public update user_roles" ON public.user_roles FOR UPDATE USING (true) WITH CHECK (true);
+
+-- 7. STORAGE POLICIES
+DROP POLICY IF EXISTS "Public read character_sheets" ON storage.objects;
+CREATE POLICY "Public read character_sheets" ON storage.objects FOR SELECT USING (bucket_id = 'character_sheets');
+
+DROP POLICY IF EXISTS "Public upload character_sheets" ON storage.objects;
+CREATE POLICY "Public upload character_sheets" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'character_sheets');
+
+DROP POLICY IF EXISTS "Public update character_sheets" ON storage.objects;
+CREATE POLICY "Public update character_sheets" ON storage.objects FOR UPDATE USING (bucket_id = 'character_sheets');
+
+-- 8. REALTME PUBLICATION
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_publication_tables 
+        WHERE pubname = 'supabase_realtime' AND tablename = 'accio_settings'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.accio_settings;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_publication_tables 
+        WHERE pubname = 'supabase_realtime' AND tablename = 'user_roles'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.user_roles;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_publication_tables 
+        WHERE pubname = 'supabase_realtime' AND tablename = 'character_applications'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.character_applications;
+    END IF;
+END $$;

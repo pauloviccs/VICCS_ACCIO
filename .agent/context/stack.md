@@ -18,8 +18,8 @@
 | UI Panels | HTML5 + CSS3 + JavaScript | Web standards |
 | Shared Scripts | JavaScript (ES2022+) | Lógica compartilhada client/server |
 | Config Files | JSON | Configurações parametrizadas |
-| Website | TypeScript + Framework Web | A definir (Next.js ou Astro) |
-| Edge Functions | TypeScript | Supabase Edge Functions (Deno) |
+| Website | TypeScript + React 19 + Vite 6 | Tailwind CSS v4, Three.js, jsPDF, html2canvas |
+| Edge Functions | TypeScript | Supabase Edge Functions (Deno — planejado) |
 
 ## Banco de Dados & Backend
 
@@ -54,10 +54,19 @@ Resources padrão do Arcane MP que utilizamos como fundação:
 
 | Ferramenta | Uso |
 |-----------|-----|
-| Git | Versionamento |
-| VS Code | IDE principal |
-| ESLint + Prettier | Linting e formatação |
-| Supabase CLI | Gestão do banco local e migrations |
+| Git | Versionamento (monorepo `VICCS_ACCIO.git`) |
+| Vite 6 + TypeScript | Build e bundling da plataforma web (`website/`) |
+| Python / OpenCV | Processamento e recorte alfa de assets de varinhas |
+| Supabase CLI | Gestão de banco e migrations (`supabase/` planejado) |
+
+## Integrações Web (Website)
+
+| Tecnologia | Uso |
+|-----------|-----|
+| Three.js | Estandartes 3D das Quatro Casas |
+| jsPDF + html2canvas | Geração de ficha oficial em PDF e upload no Storage |
+| Web Audio API + HTMLAudioElement | SFX procedurais e trilha sonora orquestral MP3 |
+| Discord OAuth2 + Webhooks | Autenticação de jogadores e Rich Embeds ministeriais |
 
 ## Networking
 

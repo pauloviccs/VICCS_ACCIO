@@ -7,7 +7,7 @@ O VICCS Accio é um servidor de Roleplay MMO-RPG ambientado no universo de Hogwa
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     CAMADA DE APRESENTAÇÃO                       │
-│  Website (Next.js/Astro) │ Painel Admin │ Launcher Arcane MP    │
+│  Website (React 19 + Vite 6 + Three.js) │ Painel Admin │ Arcane MP│
 └─────────────────────┬───────────────────────┬───────────────────┘
                       │                       │
 ┌─────────────────────▼───────────────────────▼───────────────────┐

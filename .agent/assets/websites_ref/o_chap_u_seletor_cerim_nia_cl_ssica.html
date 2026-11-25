@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>O Chapéu Seletor — Cerimônia de Seleção</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #0b0d13;
+      --card-bg: #131722;
+      --gold: #d4af37;
+      --gold-soft: rgba(212, 175, 55, 0.25);
+      --parchment: #f4ebd9;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-deep);
+      background-image:
+        radial-gradient(circle at 20% 15%, rgba(212, 175, 55, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 80% 85%, rgba(79, 70, 229, 0.08) 0%, transparent 45%),
+        linear-gradient(180deg, #090b10 0%, #111521 100%);
+      color: #e8e4dc;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .font-cinzel {
+      font-family: 'Cinzel', serif;
+    }
+
+    .font-crimson {
+      font-family: 'Crimson Pro', serif;
+    }
+
+    /* Partículas mágicas sutis no fundo */
+    .starfield {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(1px 1px at 15% 25%, rgba(255, 240, 200, 0.5) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 72% 18%, rgba(212, 175, 55, 0.6) 50%, transparent 100%),
+        radial-gradient(1px 1px at 42% 68%, rgba(255, 255, 255, 0.4) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 88% 62%, rgba(212, 175, 55, 0.5) 50%, transparent 100%),
+        radial-gradient(1px 1px at 28% 84%, rgba(255, 240, 200, 0.4) 50%, transparent 100%);
+      animation: twinkle 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.45; }
+      100% { opacity: 0.95; }
+    }
+
+    .glass-panel {
+      background: rgba(19, 23, 34, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(212, 175, 55, 0.24);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .option-btn {
+      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .option-btn:hover {
+      border-color: rgba(212, 175, 55, 0.65);
+      background: rgba(212, 175, 55, 0.09);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .option-btn:active {
+      transform: translateY(0);
+    }
+
+    @keyframes floatHat {
+      0%, 100% { transform: translateY(0px) rotate(-1deg); }
+      50% { transform: translateY(-7px) rotate(1.5deg); }
+    }
+
+    .hat-float {
+      animation: floatHat 4.5s ease-in-out infinite;
+    }
+
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeSlideIn 0.45s ease forwards;
+    }
+
+    /* Pergaminho da Carta */
+    .parchment-card {
+      background: linear-gradient(135deg, #f6eedc 0%, #eadbc0 100%);
+      color: #231b12;
+      border: 2px solid #b89446;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(139, 101, 36, 0.18);
+    }
+  </style>
+</head>
+<body class="relative flex flex-col items-center justify-center p-4 sm:p-6 md:p-10">
+  <div class="starfield"></div>
+
+  <!-- Cabeçalho Principal -->
+  <header class="relative z-10 w-full max-w-3xl text-center mb-6 sm:mb-8">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs tracking-widest uppercase mb-3">
+      <span>Cerimônia de Seleção • Edição Clássica</span>
+    </div>
+    <h1 class="font-cinzel text-3xl sm:text-4xl md:text-5xl font-bold tracking-wide text-amber-100 drop-shadow">
+      O Chapéu Seletor
+    </h1>
+    <p class="font-crimson italic text-lg sm:text-xl text-slate-300 mt-1">
+      "Não há nada escondido em sua cabeça que o Chapéu Seletor não possa ver..."
+    </p>
+  </header>
+
+  <!-- Container Principal -->
+  <main class="relative z-10 w-full max-w-3xl">
+
+    <!-- TELA 1: INTRODUÇÃO -->
+    <section id="screen-intro" class="glass-panel rounded-2xl p-6 sm:p-10 text-center fade-in">
+      <!-- Ilustração SVG do Chapéu Seletor -->
+      <div class="w-28 h-28 sm:w-32 sm:h-32 mx-auto mb-5 hat-float flex items-center justify-center">
+        <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Aba do chapéu -->
+          <ellipse cx="100" cy="158" rx="84" ry="19" fill="#3a281c" stroke="#694a33" stroke-width="3"/>
+          <ellipse cx="100" cy="155" rx="76" ry="14" fill="#2b1d14"/>
+          <!-- Corpo principal -->
+          <path d="M44 153 C52 115, 62 78, 86 42 C96 27, 118 18, 134 26 C125 42, 121 56, 128 76 C137 104, 148 128, 156 153 Z" fill="#473122" stroke="#6e4e37" stroke-width="3" stroke-linejoin="round"/>
+          <!-- Dobras expressivas (olhos e boca do chapéu) -->
+          <path d="M74 96 Q88 86 98 97" stroke="#1f140d" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M107 97 Q118 87 130 96" stroke="#1f140d" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M72 126 Q102 140 132 124" stroke="#1a100a" stroke-width="5.5" stroke-linecap="round"/>
+          <path d="M80 129 Q102 136 124 128" stroke="#6e4e37" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Remendos -->
+          <rect x="65" y="106" width="14" height="10" rx="2" transform="rotate(-12 65 106)" fill="#593e2b" stroke="#2b1d14" stroke-width="1.5"/>
+          <path d="M114 63 L124 67" stroke="#2b1d14" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h2 class="font-cinzel text-xl sm:text-2xl font-bold text-amber-200 mb-3">
+        Aproxime-se e sente-se no banquinho
+      </h2>
+      <p class="font-crimson text-lg sm:text-xl text-slate-200 leading-relaxed max-w-xl mx-auto mb-6">
+        Diferente de testes comuns, esta avaliação não possui respostas óbvias nem caminhos pré-marcados.
+        Cada dilema analisa nuances do seu temperamento, suas reações sob pressão e aquilo que você valoriza silenciosamente.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left text-xs sm:text-sm text-slate-300 bg-black/30 rounded-xl p-4 border border-amber-500/15 mb-7">
+        <div class="flex items-start gap-2.5">
+          <span class="text-amber-400 font-bold">✦</span>
+          <span><strong>Sessão Única:</strong> As perguntas e alternativas são sorteadas e embaralhadas a cada início.</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-amber-400 font-bold">✦</span>
+          <span><strong>Sem Rótulos Óbvios:</strong> Nenhuma escolha pertence exclusivamente a uma única casa.</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-amber-400 font-bold">✦</span>
+          <span><strong>Detecção de Hatstall:</strong> Empates técnicos acionam uma pergunta decisiva do Chapéu.</span>
+        </div>
+      </div>
+
+      <button id="btn-start" class="font-cinzel px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 text-slate-950 font-bold text-base sm:text-lg tracking-wider shadow-lg shadow-amber-900/40 hover:brightness-110 transition cursor-pointer">
+        Colocar o Chapéu Seletor
+      </button>
+    </section>
+
+    <!-- TELA 2: QUESTIONÁRIO -->
+    <section id="screen-quiz" class="hidden glass-panel rounded-2xl p-6 sm:p-9">
+      <!-- Barra de Progresso e Status -->
+      <div class="flex items-center justify-between text-xs sm:text-sm text-amber-200/80 mb-2">
+        <span id="question-counter" class="font-cinzel tracking-wider uppercase">Pergunta 1 de 8</span>
+        <span id="hat-whisper" class="font-crimson italic text-amber-300/90 text-base">"Hmm... interessante..."</span>
+      </div>
+      <div class="w-full h-2 bg-slate-800/90 rounded-full overflow-hidden mb-6 border border-amber-500/20">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-amber-600 to-yellow-400 transition-all duration-500" style="width: 12.5%"></div>
+      </div>
+
+      <!-- Aviso de Empate Técnico (Hatstall) -->
+      <div id="hatstall-banner" class="hidden mb-5 p-3.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-200 text-sm font-crimson italic">
+        "Difícil... muito difícil. Vejo qualidades quase equivalentes em você. Responda com total sinceridade a esta última questão para que eu possa decidir..."
+      </div>
+
+      <!-- Texto da Pergunta -->
+      <div id="question-container" class="fade-in">
+        <h3 id="question-title" class="font-cinzel text-xs uppercase tracking-widest text-amber-400/80 mb-1.5">
+          Dilema I
+        </h3>
+        <p id="question-text" class="font-crimson text-xl sm:text-2xl text-amber-50 leading-relaxed mb-6">
+          Carregando pergunta...
+        </p>
+
+        <!-- Lista de Alternativas -->
+        <div id="options-list" class="space-y-3">
+          <!-- Botões inseridos via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TELA 3: DELIBERAÇÃO DO CHAPÉU -->
+    <section id="screen-thinking" class="hidden glass-panel rounded-2xl p-8 sm:p-12 text-center">
+      <div class="w-24 h-24 mx-auto mb-5 hat-float">
+        <svg viewBox="0 0 200 200" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="158" rx="84" ry="19" fill="#3a281c" stroke="#d4af37" stroke-width="2.5"/>
+          <path d="M44 153 C52 115, 62 78, 86 42 C96 27, 118 18, 134 26 C125 42, 121 56, 128 76 C137 104, 148 128, 156 153 Z" fill="#473122" stroke="#d4af37" stroke-width="2.5"/>
+          <path d="M74 96 Q88 86 98 97" stroke="#1f140d" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M107 97 Q118 87 130 96" stroke="#1f140d" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M78 131 Q102 122 126 131" stroke="#1a100a" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 class="font-cinzel text-xl sm:text-2xl text-amber-200 mb-2">O Chapéu está deliberando...</h3>
+      <p id="deliberation-text" class="font-crimson italic text-lg sm:text-xl text-slate-300">
+        "Vejo coragem, sim... e uma mente que não se contenta com respostas fáceis..."
+      </p>
+    </section>
+
+    <!-- TELA 4: RESULTADO FINAL (CARTA DE BOAS-VINDAS) -->
+    <section id="screen-result" class="hidden fade-in">
+      <div id="result-banner" class="rounded-2xl p-6 sm:p-8 text-center mb-6 border shadow-2xl transition-all">
+        <p class="font-cinzel text-xs sm:text-sm uppercase tracking-[0.25em] opacity-85 mb-2">
+          O Chapéu Seletor anunciou:
+        </p>
+        <h2 id="house-name" class="font-cinzel text-4xl sm:text-5xl md:text-6xl font-black tracking-wider uppercase mb-2">
+          GRIFINÓRIA
+        </h2>
+        <p id="house-motto" class="font-crimson italic text-lg sm:text-xl opacity-90">
+          "Onde habitam os corações indômitos"
+        </p>
+      </div>
+
+      <!-- Carta Clássica estilo Pottermore -->
+      <article class="parchment-card rounded-2xl p-6 sm:p-9 mb-6">
+        <div class="flex items-center justify-between border-b border-amber-900/25 pb-4 mb-5">
+          <div>
+            <span class="text-xs uppercase tracking-widest text-amber-900/70 font-semibold block">Mensagem do Monitor-Chefe</span>
+            <h3 id="welcome-title" class="font-cinzel text-xl sm:text-2xl font-bold text-stone-900">
+              Bem-vindo(a) à Casa
+            </h3>
+          </div>
+          <div id="house-crest" class="w-12 h-12 rounded-full flex items-center justify-center text-2xl shadow-inner border border-amber-900/30 bg-amber-900/10">
+            🦁
+          </div>
+        </div>
+
+        <div id="house-letter" class="font-crimson text-lg sm:text-xl leading-relaxed space-y-4 text-stone-800">
+          <!-- Texto da carta inserido via JS -->
+        </div>
+
+        <!-- Diagnóstico Sutil de Perfil (sem expor fórmulas) -->
+        <div class="mt-7 pt-5 border-t border-amber-900/20">
+          <p class="font-cinzel text-xs uppercase tracking-wider text-amber-950/75 mb-3">
+            Leitura do Chapéu Seletor sobre sua mente:
+          </p>
+          <p id="hat-analysis" class="font-crimson italic text-base sm:text-lg text-stone-800">
+            <!-- Análise personalizada -->
+          </p>
+        </div>
+      </article>
+
+      <!-- Ações -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <button id="btn-copy" class="w-full sm:w-auto px-6 py-3 rounded-xl glass-panel text-amber-200 hover:text-white hover:border-amber-400/60 font-medium text-sm transition cursor-pointer">
+          Copiar Resultado
+        </button>
+        <button id="btn-restart" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-100 hover:bg-amber-500/30 font-cinzel text-sm tracking-wider transition cursor-pointer">
+          Refazer Cerimônia (Novas Perguntas)
+        </button>
+      </div>
+
+      <!-- Notificação interna sem alert() -->
+      <div id="toast" class="hidden mt-4 text-center text-sm text-amber-300 font-medium">
+        Resultado copiado para a área de transferência!
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    /**
+     * BANCO DE PERGUNTAS CLÁSSICAS & DILEMAS SITUACIONAIS (ANTI-MANIPULAÇÃO)
+     * 
+     * Como funciona o sistema "Fail-Proof":
+     * 1. Nenhuma opção dá pontos puros (ex: 100% Grifinória). Cada opção distribui
+     *    pesos primários e secundários entre as 4 casas (G, R, H, S) com base em
+     *    motivações psicológicas reais (ex: coragem impulsiva vs. coragem estratégica).
+     * 2. O banco possui 16 perguntas; cada sessão seleciona 8 aleatoriamente e
+     *    embaralha a ordem das alternativas.
+     * 3. Há controle de consistência: se a diferença entre a 1ª e a 2ª casa for
+     *    menor que 1.8 pontos, o Chapéu ativa o modo "Hatstall" com uma pergunta
+     *    decisiva de desempate.
+     */
+    const QUESTION_BANK = [
+      {
+        category: "Instinto & Reação",
+        text: "Ao caminhar por um corredor deserto ao anoitecer, você ouve passos apressados e um sussurro tenso vindo de trás de uma tapeçaria. Qual é sua reação imediata?",
+        options: [
+          { text: "Afasto a tapeçaria sem hesitar para confrontar quem está ali antes que fuja.", weights: { G: 2.4, S: 0.7, R: 0.2, H: 0.1 } },
+          { text: "Fico imóvel nas sombras e escuto em silêncio para descobrir o assunto antes de agir.", weights: { S: 2.1, R: 1.1, G: 0.2, H: 0.1 } },
+          { text: "Observo o padrão das pegadas e a acústica do corredor para deduzir quantas pessoas são.", weights: { R: 2.3, S: 0.8, H: 0.2, G: 0.1 } },
+          { text: "Pergunto em voz calma se alguém precisa de ajuda ou está perdido.", weights: { H: 2.4, G: 0.8, R: 0.2, S: 0.0 } }
+        ]
+      },
+      {
+        category: "Natureza & Contemplação",
+        text: "Entre estas quatro paisagens silenciosas, qual delas desperta uma sensação imediata de pertencimento em você?",
+        options: [
+          { text: "O topo de um penhasco varrido pelo vento, onde o horizonte parece infinito.", weights: { R: 1.9, G: 1.3, S: 0.2, H: 0.1 } },
+          { text: "Uma clareira iluminada pelo sol da manhã, cercada por árvores antigas e tranquilas.", weights: { H: 2.3, G: 0.6, R: 0.4, S: 0.1 } },
+          { text: "As profundezas de um lago escuro e calmo, onde a luz mal toca a superfície.", weights: { S: 2.2, R: 1.0, H: 0.2, G: 0.1 } },
+          { text: "Uma floresta densa e selvagem ao entardecer, cheia de trilhas desconhecidas.", weights: { G: 2.2, R: 0.7, S: 0.4, H: 0.2 } }
+        ]
+      },
+      {
+        category: "Dilema Moral",
+        text: "Um amigo próximo cometeu um erro grave que pode prejudicar outra pessoa inocente, mas pede que você guarde segredo absoluto. O que você faz?",
+        options: [
+          { text: "Convenço meu amigo a assumir a responsabilidade junto comigo, custe o que custar.", weights: { G: 2.1, H: 1.2, R: 0.2, S: 0.0 } },
+          { text: "Mantenho o segredo dele, mas intervenho discretamente para impedir que o inocente sofra.", weights: { S: 2.0, H: 1.1, R: 0.5, G: 0.1 } },
+          { text: "Não traio a confiança do meu amigo diretamente, mas busco uma solução justa para reparar o dano.", weights: { H: 2.2, S: 0.7, R: 0.4, G: 0.2 } },
+          { text: "Analiso todas as consequências lógicas antes de decidir qual princípio deve prevalecer.", weights: { R: 2.3, S: 0.7, H: 0.3, G: 0.1 } }
+        ]
+      },
+      {
+        category: "Artefatos Antigos",
+        text: "Sobre uma mesa de pedra antiga repousam quatro objetos sem qualquer inscrição. Qual chama sua atenção primeiro?",
+        options: [
+          { text: "Uma ampulheta cuja areia parece subir lentamente em vez de cair.", weights: { R: 2.2, S: 0.9, H: 0.2, G: 0.1 } },
+          { text: "Uma adaga de prata embainhada, marcada por sinais de antigas batalhas.", weights: { G: 2.3, S: 0.8, H: 0.1, R: 0.2 } },
+          { text: "Um anel pesado com uma pedra escura que parece aquecer ao se aproximar.", weights: { S: 2.3, G: 0.6, R: 0.4, H: 0.1 } },
+          { text: "Um cálice simples de bronze polido pelo toque de muitas gerações.", weights: { H: 2.3, G: 0.6, R: 0.3, S: 0.2 } }
+        ]
+      },
+      {
+        category: "O Espelho da Mente",
+        text: "Se você pudesse beber apenas uma poção única na vida, qual efeito escolheria?",
+        options: [
+          { text: "A clareza absoluta para compreender qualquer enigma ou verdade oculta.", weights: { R: 2.4, S: 0.7, H: 0.2, G: 0.1 } },
+          { text: "A capacidade de inspirar confiança e unir pessoas em torno de um propósito.", weights: { H: 1.9, G: 1.1, S: 0.5, R: 0.1 } },
+          { text: "A determinação inabalável para realizar sua maior ambição sem jamais vacilar.", weights: { S: 2.3, G: 0.8, R: 0.3, H: 0.0 } },
+          { text: "A audácia pura para enfrentar o impossível sem sentir medo.", weights: { G: 2.4, S: 0.6, H: 0.3, R: 0.1 } }
+        ]
+      },
+      {
+        category: "Conflito & Estratégia",
+        text: "Durante uma competição difícil em equipe, você percebe que o plano atual vai falhar. Como você age?",
+        options: [
+          { text: "Assumo a linha de frente e improviso uma jogada ousada para virar o jogo.", weights: { G: 2.3, S: 0.7, H: 0.2, R: 0.2 } },
+          { text: "Reorganizo silenciosamente os papéis do grupo para explorar a fraqueza do adversário.", weights: { S: 2.3, R: 0.9, G: 0.2, H: 0.1 } },
+          { text: "Aponto a falha lógica no plano e proponho uma alternativa mais eficiente.", weights: { R: 2.3, S: 0.7, H: 0.3, G: 0.1 } },
+          { text: "Garanto que ninguém desanime e cubro as falhas dos colegas para mantermos o ritmo.", weights: { H: 2.4, G: 0.7, R: 0.2, S: 0.1 } }
+        ]
+      },
+      {
+        category: "Memória & Legado",
+        text: "Quando pessoas que convivem com você falam ao seu respeito quando você não está presente, o que você mais gostaria que dissessem?",
+        options: [
+          { text: "Que você nunca abandonou alguém quando as coisas ficaram difíceis.", weights: { H: 2.2, G: 1.1, R: 0.1, S: 0.1 } },
+          { text: "Que você sempre enxergava soluções que ninguém mais conseguia ver.", weights: { R: 2.3, S: 0.8, H: 0.2, G: 0.1 } },
+          { text: "Que você teve coragem de fazer o que era certo mesmo estando sozinho.", weights: { G: 2.4, H: 0.7, R: 0.2, S: 0.1 } },
+          { text: "Que você sabia exatamente onde queria chegar e conquistou seu lugar.", weights: { S: 2.4, R: 0.6, G: 0.4, H: 0.0 } }
+        ]
+      },
+      {
+        category: "O Caminho Bifurcado",
+        text: "Você está diante de duas portas fechadas: uma exige resolver um enigma complexo; a outra exige atravessar uma ponte estreita sobre um abismo. Qual você escolhe?",
+        options: [
+          { text: "A ponte — prefiro confiar nos meus próprios passos a ficar parado pensando.", weights: { G: 2.3, S: 0.6, H: 0.4, R: 0.1 } },
+          { text: "O enigma — não há motivo para arriscar a vida se a mente pode abrir o caminho.", weights: { R: 2.3, S: 0.8, H: 0.2, G: 0.1 } },
+          { text: "Examino ambas primeiro para descobrir qual delas leva ao destino mais seguro e vantajoso.", weights: { S: 2.1, R: 1.0, H: 0.3, G: 0.1 } },
+          { text: "Escolho aquela em que eu possa ajudar quem estiver comigo a atravessar melhor.", weights: { H: 2.3, G: 0.8, R: 0.2, S: 0.1 } }
+        ]
+      },
+      {
+        category: "Injustiça Silenciosa",
+        text: "Você descobre que alguém recebeu crédito por um trabalho brilhante que na verdade foi feito por um colega tímido. O que você faz?",
+        options: [
+          { text: "Exponho a verdade publicamente na primeira oportunidade, sem me importar com o clima.", weights: { G: 2.3, H: 0.9, R: 0.2, S: 0.0 } },
+          { text: "Apoio o colega e o ajudo a apresentar provas concretas de que o trabalho é dele.", weights: { H: 2.1, R: 1.0, G: 0.4, S: 0.1 } },
+          { text: "Uso a informação com cautela para virar a situação a favor do verdadeiro autor no momento certo.", weights: { S: 2.2, R: 0.8, H: 0.4, G: 0.1 } },
+          { text: "Documento os fatos com precisão para que a verdade se sustente por si mesma.", weights: { R: 2.2, H: 0.8, S: 0.4, G: 0.1 } }
+        ]
+      },
+      {
+        category: "Horas Solitárias",
+        text: "Você tem uma noite inteira livre, sem obrigações ou distrações. Como ela tende a passar?",
+        options: [
+          { text: "Mergulhado em um livro, projeto ou ideia que prende toda a minha curiosidade.", weights: { R: 2.4, S: 0.5, H: 0.4, G: 0.1 } },
+          { text: "Planejando meus próximos passos e organizando metas pessoais importantes.", weights: { S: 2.3, R: 0.8, G: 0.2, H: 0.1 } },
+          { text: "Conversando, cozinhando ou criando um ambiente acolhedor para pessoas queridas.", weights: { H: 2.4, G: 0.6, R: 0.2, S: 0.2 } },
+          { text: "Saindo para explorar algum lugar novo ou praticando algo que exija energia.", weights: { G: 2.3, H: 0.6, S: 0.3, R: 0.2 } }
+        ]
+      },
+      {
+        category: "A Caixa Lacrada",
+        text: "Você encontra uma caixa antiga com um bilhete: 'Pertence àquele que souber usá-la'. Qual é seu primeiro pensamento?",
+        options: [
+          { text: "Quero descobrir o mecanismo interno e o propósito original de quem a construiu.", weights: { R: 2.3, S: 0.7, H: 0.2, G: 0.2 } },
+          { text: "Abro para ver o que há dentro — oportunidades assim não aparecem duas vezes.", weights: { G: 2.1, S: 1.0, R: 0.3, H: 0.0 } },
+          { text: "Avalio se o conteúdo pode ser útil para meus objetivos antes de decidir o que fazer.", weights: { S: 2.3, R: 0.7, G: 0.3, H: 0.1 } },
+          { text: "Tento descobrir se alguém a perdeu e está procurando por ela.", weights: { H: 2.4, G: 0.6, R: 0.3, S: 0.1 } }
+        ]
+      },
+      {
+        category: "O Peso da Verdade",
+        text: "O que mais irrita ou incomoda você no comportamento das outras pessoas?",
+        options: [
+          { text: "A covardia de quem foge quando precisa defender aquilo em que diz acreditar.", weights: { G: 2.4, H: 0.7, S: 0.2, R: 0.1 } },
+          { text: "A arrogância de quem se recusa a aprender ou ouvir argumentos racionais.", weights: { R: 2.4, H: 0.6, S: 0.3, G: 0.1 } },
+          { text: "A deslealdade de quem usa os outros e depois vira as costas.", weights: { H: 2.3, G: 0.8, S: 0.2, R: 0.1 } },
+          { text: "A falta de visão de quem desperdiça potencial por medo de arriscar.", weights: { S: 2.3, G: 0.7, R: 0.4, H: 0.0 } }
+        ]
+      }
+    ];
+
+    // Pergunta especial acionada apenas quando há empate técnico (Hatstall)
+    const HATSTALL_QUESTION = {
+      category: "Deliberação Final do Chapéu",
+      text: "Vejo duas forças equilibradas em sua mente. Se você precisasse escolher apenas uma bússola para guiar toda a sua vida, qual seria?",
+      options: [
+        { text: "Agir com coragem e integridade mesmo quando tudo parece perdido.", weights: { G: 3.0, H: 0.4, R: 0.1, S: 0.1 } },
+        { text: "Buscar a verdade e a compreensão profunda acima de qualquer convenção.", weights: { R: 3.0, S: 0.4, H: 0.1, G: 0.1 } },
+        { text: "Permanecer fiel às pessoas e construir algo justo e duradouro.", weights: { H: 3.0, G: 0.4, R: 0.1, S: 0.1 } },
+        { text: "Moldar o próprio destino com inteligência, astúcia e determinação.", weights: { S: 3.0, R: 0.4, G: 0.1, H: 0.1 } }
+      ]
+    };
+
+    const HOUSES = {
+      G: {
+        name: "Grifinória",
+        motto: "“Onde habitam os corações indômitos”",
+        crest: "🦁",
+        bannerStyle: "background: linear-gradient(135deg, #5c1015 0%, #8b1e24 100%); border-color: #eab308; color: #fef3c7;",
+        welcomeTitle: "Bem-vindo(a) à Casa Grifinória",
+        letter: [
+          "Parabéns! Você acaba de entrar para a casa mais audaciosa de Hogwarts. Nosso emblema é o leão, a mais corajosa de todas as criaturas; nossas cores são o escarlate e o ouro, e nossa sala comunal fica no alto da Torre da Grifinória.",
+          "Os membros da Grifinória não são pessoas que nunca sentem medo — são aqueles que escolhem agir apesar dele. Quando algo injusto acontece, seu instinto não é desviar o olhar, mas dar um passo à frente.",
+          "Entre nossos corredores passaram bruxos e bruxas que mudaram a história não porque tinham todas as respostas prontas, mas porque tiveram coragem de defender o que importava."
+        ]
+      },
+      R: {
+        name: "Corvinal",
+        motto: "“O espírito sem limites é o maior tesouro do homem”",
+        crest: "🦅",
+        bannerStyle: "background: linear-gradient(135deg, #102542 0%, #1d3f72 100%); border-color: #93c5fd; color: #eff6ff;",
+        welcomeTitle: "Bem-vindo(a) à Casa Corvinal",
+        letter: [
+          "Parabéns! Você foi selecionado(a) para a Casa Corvinal. Nosso emblema é a águia, que voa onde outros não conseguem escalar; nossas cores são o azul e o bronze, e nossa sala comunal fica no topo da Torre da Corvinal.",
+          "Aqui valorizamos a curiosidade genuína, a independência intelectual e a criatividade que questiona o óbvio. Você não se contenta em aceitar regras ou respostas sem entender sua essência.",
+          "Não por acaso, nossa entrada não exige uma senha comum, mas a resposta a um enigma — pois o conhecimento verdadeiro nunca é entregue de graça; ele é conquistado."
+        ]
+      },
+      H: {
+        name: "Lufa-Lufa",
+        motto: "“Onde são justos e leais, pacientes e sinceros”",
+        crest: "🦡",
+        bannerStyle: "background: linear-gradient(135deg, #423306 0%, #785d0b 100%); border-color: #facc15; color: #fefce8;",
+        welcomeTitle: "Bem-vindo(a) à Casa Lufa-Lufa",
+        letter: [
+          "Parabéns! Você agora faz parte da Casa Lufa-Lufa. Nosso emblema é o texugo — discreto, resiliente e feroz quando precisa proteger os seus. Nossas cores são o amarelo e o preto, e nossa sala comunal fica próxima às cozinhas, acolhedora e iluminada.",
+          "Muitos subestimam a força silenciosa da Lufa-Lufa, mas somos a única casa que jamais se deixou seduzir pela vaidade ou pela busca cega de poder. Sua força está na lealdade inabalável, na empatia real e na constância.",
+          "Quando todos os outros desistem ou se dividem, é alguém da Lufa-Lufa que mantém tudo de pé até o fim."
+        ]
+      },
+      S: {
+        name: "Sonserina",
+        motto: "“Onde você fará seus verdadeiros amigos, homens de astúcia”",
+        crest: "🐍",
+        bannerStyle: "background: linear-gradient(135deg, #0b2e1e 0%, #165237 100%); border-color: #6ee7b7; color: #ecfdf5;",
+        welcomeTitle: "Bem-vindo(a) à Casa Sonserina",
+        letter: [
+          "Parabéns! Você foi escolhido(a) para a Casa Sonserina. Nosso emblema é a serpente, símbolo de sabedoria, renovação e precisão; nossas cores são o verde-esmeralda e a prata, e nossa sala comunal se estende sob as águas tranquilas do Lago Negro.",
+          "A Sonserina reconhece aqueles que enxergam além do imediato. Você possui discernimento, autopreservação e a capacidade de transformar ambição em estratégia concreta.",
+          "Embora o mundo externo frequentemente confunda ambição com frieza, entre os nossos sabemos que grandeza exige foco, lealdade seletiva e coragem para assumir o controle do próprio destino."
+        ]
+      }
+    };
+
+    const WHISPERS = [
+      "“Hmm... interessante...”",
+      "“Vejo mais do que você deixa transparecer...”",
+      "“Difícil... há camadas aqui...”",
+      "“Sua mente revela padrões curiosos...”",
+      "“Ah, sim... isso diz muito...”",
+      "“Não tente me enganar, eu enxergo a intenção...”",
+      "“Quase lá... estou conectando os fios...”",
+      "“Uma última peça para o quebra-cabeça...”"
+    ];
+
+    // Estado da Sessão
+    let sessionQuestions = [];
+    let currentIndex = 0;
+    let scores = { G: 0, R: 0, H: 0, S: 0 };
+    let isHatstallTriggered = false;
+    let finalHouseKey = "G";
+
+    // Referências do DOM
+    const screenIntro = document.getElementById("screen-intro");
+    const screenQuiz = document.getElementById("screen-quiz");
+    const screenThinking = document.getElementById("screen-thinking");
+    const screenResult = document.getElementById("screen-result");
+
+    const btnStart = document.getElementById("btn-start");
+    const btnRestart = document.getElementById("btn-restart");
+    const btnCopy = document.getElementById("btn-copy");
+
+    const questionCounter = document.getElementById("question-counter");
+    const hatWhisper = document.getElementById("hat-whisper");
+    const progressBar = document.getElementById("progress-bar");
+    const hatstallBanner = document.getElementById("hatstall-banner");
+    const questionContainer = document.getElementById("question-container");
+    const questionTitle = document.getElementById("question-title");
+    const questionText = document.getElementById("question-text");
+    const optionsList = document.getElementById("options-list");
+
+    // Utilitário Fisher-Yates para embaralhamento justo
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Inicia ou reinicia a cerimônia
+    function startCeremony() {
+      scores = { G: 0, R: 0, H: 0, S: 0 };
+      currentIndex = 0;
+      isHatstallTriggered = false;
+      hatstallBanner.classList.add("hidden");
+
+      // Seleciona 8 perguntas aleatórias do banco e embaralha as opções de cada uma
+      const picked = shuffleArray(QUESTION_BANK).slice(0, 8);
+      sessionQuestions = picked.map(q => ({
+        ...q,
+        options: shuffleArray(q.options)
+      }));
+
+      screenIntro.classList.add("hidden");
+      screenResult.classList.add("hidden");
+      screenThinking.classList.add("hidden");
+      screenQuiz.classList.remove("hidden");
+
+      renderQuestion();
+    }
+
+    // Renderiza a pergunta atual
+    function renderQuestion() {
+      const total = sessionQuestions.length;
+      const q = sessionQuestions[currentIndex];
+
+      questionCounter.textContent = isHatstallTriggered
+        ? "Desempate do Chapéu Seletor"
+        : `Pergunta ${currentIndex + 1} de ${total}`;
+
+      hatWhisper.textContent = WHISPERS[currentIndex % WHISPERS.length];
+      progressBar.style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+      // Reinicia animação suave
+      questionContainer.classList.remove("fade-in");
+      void questionContainer.offsetWidth;
+      questionContainer.classList.add("fade-in");
+
+      questionTitle.textContent = q.category;
+      questionText.textContent = q.text;
+
+      optionsList.innerHTML = "";
+      q.options.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option-btn w-full text-left p-4 sm:p-5 rounded-xl font-crimson text-lg sm:text-xl text-slate-100 leading-snug cursor-pointer flex items-start gap-3";
+        btn.innerHTML = `
+          <span class="text-amber-400/80 mt-0.5 text-sm">◆</span>
+          <span>${opt.text}</span>
+        `;
+        btn.addEventListener("click", () => handleAnswer(opt.weights));
+        optionsList.appendChild(btn);
+      });
+    }
+
+    // Processa resposta e verifica empate técnico (Hatstall)
+    function handleAnswer(weights) {
+      scores.G += weights.G;
+      scores.R += weights.R;
+      scores.H += weights.H;
+      scores.S += weights.S;
+
+      currentIndex++;
+
+      if (currentIndex < sessionQuestions.length) {
+        renderQuestion();
+        return;
+      }
+
+      // Verifica se há empate técnico (Hatstall) entre as duas maiores pontuações
+      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const diff = sorted[0][1] - sorted[1][1];
+
+      if (!isHatstallTriggered && diff < 1.6) {
+        isHatstallTriggered = true;
+        hatstallBanner.classList.remove("hidden");
+        sessionQuestions.push({
+          ...HATSTALL_QUESTION,
+          options: shuffleArray(HATSTALL_QUESTION.options)
+        });
+        renderQuestion();
+        return;
+      }
+
+      beginDeliberation(sorted);
+    }
+
+    // Animação dramática antes do anúncio
+    function beginDeliberation(sortedScores) {
+      screenQuiz.classList.add("hidden");
+      screenThinking.classList.remove("hidden");
+
+      const topHouse = sortedScores[0][0];
+      const secondHouse = sortedScores[1][0];
+      finalHouseKey = topHouse;
+
+      const houseNames = { G: "Grifinória", R: "Corvinal", H: "Lufa-Lufa", S: "Sonserina" };
+      const deliberationEl = document.getElementById("deliberation-text");
+
+      setTimeout(() => {
+        deliberationEl.textContent = `“Vejo traços fortes de ${houseNames[secondHouse]}... mas há algo ainda mais determinante aqui...”`;
+      }, 1100);
+
+      setTimeout(() => {
+        showResult(sortedScores);
+      }, 2500);
+    }
+
+    // Exibe a carta e a casa final
+    function showResult(sortedScores) {
+      screenThinking.classList.add("hidden");
+      screenResult.classList.remove("hidden");
+
+      const house = HOUSES[finalHouseKey];
+      const secondKey = sortedScores[1][0];
+      const houseNames = { G: "Grifinória", R: "Corvinal", H: "Lufa-Lufa", S: "Sonserina" };
+
+      const banner = document.getElementById("result-banner");
+      banner.setAttribute("style", house.bannerStyle);
+
+      document.getElementById("house-name").textContent = house.name;
+      document.getElementById("house-motto").textContent = house.motto;
+      document.getElementById("welcome-title").textContent = house.welcomeTitle;
+      document.getElementById("house-crest").textContent = house.crest;
+
+      const letterContainer = document.getElementById("house-letter");
+      letterContainer.innerHTML = house.letter.map(p => `<p>${p}</p>`).join("");
+
+      const analysisText = isHatstallTriggered
+        ? `Você protagonizou um raro "Hatstall" (empate técnico) entre ${house.name} e ${houseNames[secondKey]}. Sua decisão final revelou que, nos momentos decisivos, sua essência inclina-se naturalmente para ${house.name}.`
+        : `Embora sua mente carregue uma afinidade secundária com ${houseNames[secondKey]}, suas escolhas ao longo da cerimônia apontaram com clareza para a essência de ${house.name}.`;
+
+      document.getElementById("hat-analysis").textContent = analysisText;
+    }
+
+    // Copia resultado sem alert()
+    btnCopy.addEventListener("click", () => {
+      const house = HOUSES[finalHouseKey];
+      const textToCopy = `O Chapéu Seletor me colocou na casa ${house.name}! ${house.crest} — ${house.motto}`;
+
+      const tempInput = document.createElement("textarea");
+      tempInput.value = textToCopy;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+
+      const toast = document.getElementById("toast");
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 3000);
+    });
+
+    btnStart.addEventListener("click", startCeremony);
+    btnRestart.addEventListener("click", startCeremony);
+  </script>
+</body>
+</html>

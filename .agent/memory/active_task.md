@@ -1,19 +1,21 @@
 # Tarefa Ativa
 
-## Status: 🟢 CONCLUÍDO (Pronto para Nova Demanda)
+## Status: 🟢 CONCLUÍDO (Documentação Sincronizada — Pronto para Fase 1)
 
 ## Última Fase Entregue
-**Fase 1.2 & 1.3 — Plataforma Web de Pré-Registro, Criação de Personagem Hogwarts Legacy & Supabase ACCIO_Rp**
+**Sincronização Geral de Documentação & Consolidação da Plataforma Web (`website/` + `.agent/` + `README.md`)**
 
-Todas as entregas da plataforma web de pré-registro e infraestrutura foram finalizadas com sucesso:
-1. **Criação de Personagem Padrão Hogwarts Legacy:** 11 famílias de cabos de varinhas recortadas em PNG transparente com OpenCV; pedestal cinematográfico com alternador `3D Macro` e `Guia de Campo`; eliminação do arrasto nativo de mouse.
-2. **Motor Dinâmico de Temas das Quatro Casas:** Transição de cores universal suave em 0.8s acionada pelas bandeiras 3D, navbar ou ficha, persistida no `localStorage` e perfil Discord.
-3. **Migração & Conexão Supabase Oficial:** Projeto `ACCIO_Rp` (`siwjyavftankitbdagzo`) 100% configurado com tabelas `character_applications`, `accio_settings`, `user_roles`, bucket `character_sheets`, RLS e Realtime ativos.
-4. **Ficha em PDF & Notificações Discord:** Geração de documento de época em pergaminho (PDF), upload em nuvem e disparo de Rich Embeds diagramados via Webhook.
-5. **Git Repositories:** Sincronizados com sucesso tanto no monorepo (`VICCS_ACCIO.git`) quanto no repositório dedicado (`accio_rp_website.git`).
+1. **Plataforma Web de Pré-Registro (`website/`):**
+   - Aplicação React 19 + Vite 6 + TypeScript + Tailwind CSS v4 operacional com 14 componentes em `website/src/components/`.
+   - Motor dinâmico de temas das Quatro Casas (`data-house-theme`), Estandartes 3D em Three.js (`CastleBanners3D`), Carta de Hogwarts 3D (`HogwartsLetterModal`) e criação de personagem em 4 etapas (`WhitelistFormModal`) com 11 famílias de cabos de varinhas em PNG transparente (`public/wands/cutouts/`).
+   - Gerador de pergaminho em PDF (`jsPDF` + `html2canvas`) com upload para o bucket `character_sheets`, envio de Rich Embeds via Discord Webhook, cronômetro sincronizado em Realtime (`AppleTimerModal`) e player de trilha sonora orquestral (`MusicPlayerWidget` com 6 faixas MP3 + SFX procedurais em `audio.ts`).
+2. **Infraestrutura Supabase Oficial (`ACCIO_Rp` — `siwjyavftankitbdagzo`):**
+   - Schema consolidado em `scripts/migration_accio_rp.sql` com tabelas `character_applications`, `accio_settings` e `user_roles`, bucket `character_sheets`, políticas RLS e publicações `supabase_realtime`.
+3. **Auditoria & Sincronização Documental (2026-11-25):**
+   - Atualizados `.agent/overview/PROJECT_STATUS.md`, `.agent/context/*`, `.agent/memory/*`, `.agent/implementation-plans/master-plan.md`, `README.md` e `website/README.md` para refletir 100% do código e assets reais do repositório.
 
 ## Próximos Passos (Aguardando Comando)
-- **Fase 1 — Setup do Servidor Arcane MP:**
-  - Instalar e configurar Arcane MP Server na pasta `server/`.
-  - Configurar `server.json` e banco relacional MySQL/MariaDB para persistência de gameplay.
-  - Desenvolver conector de sincronização entre candidaturas aprovadas no Supabase e accounts no servidor de jogo.
+- **Fase 1 — Setup do Servidor Arcane MP (`server/`):**
+  - Instalar e configurar o Arcane MP Server no diretório `server/` (atualmente apenas com `.gitkeep`).
+  - Criar `server.json`, instalar HMP Foundations e configurar banco MySQL/MariaDB via `hmp-mysql`.
+  - Conectar o pipeline de contas aprovadas no Supabase (`character_applications`) ao banco de gameplay do servidor.

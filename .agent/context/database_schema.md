@@ -96,11 +96,16 @@ CREATE TABLE public.character_applications (
     word_count INTEGER NOT NULL DEFAULT 0,
     rp_experience TEXT,
     rules_accepted BOOLEAN NOT NULL DEFAULT true,
-    status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'approved', 'rejected'
+    status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'approved', 'rejected' (e 'revision_requested' previsto no frontend)
     reviewer_notes TEXT,
     reviewed_by TEXT,
     pdf_url TEXT                      -- Link público do pergaminho em PDF
 );
+
+-- Índices ativos:
+-- idx_character_applications_discord_id (discord_id)
+-- idx_character_applications_status (status)
+-- idx_character_applications_created_at (created_at DESC)
 
 -- 2. Configurações Globais & Realtime (Cronômetro Apple, Fases)
 CREATE TABLE public.accio_settings (

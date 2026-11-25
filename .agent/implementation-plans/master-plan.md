@@ -4,12 +4,12 @@
 
 ```
 Fase 0 ✅  Biblioteca de Contexto (.agent cortex)
-Fase 1     Setup do Servidor e Infraestrutura
-Fase 2     Core Resources (fundação do ecossistema)
-Fase 3     Sistemas de Gameplay (mecânicas principais)
-Fase 4     Mundo e Imersão (NPCs, beasts, world)
-Fase 5     Administração e Plataforma Web
-Fase 6     Polish, Testes e Launch
+Fase 1 ⏳  Setup do Servidor e Infraestrutura (Arcane MP em server/; Supabase ACCIO_Rp ✅)
+Fase 2 ⏳  Core Resources (fundação do ecossistema)
+Fase 3 ⏳  Sistemas de Gameplay (mecânicas principais)
+Fase 4 ⏳  Mundo e Imersão (NPCs, beasts, world)
+Fase 5 ✅/⏳ Administração e Plataforma Web (Website Pré-Registro & Painel Admin Web ✅; viccs-admin ⏳)
+Fase 6 ⏳  Polish, Testes e Launch
 ```
 
 ---

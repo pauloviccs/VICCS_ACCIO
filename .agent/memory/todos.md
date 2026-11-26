@@ -29,15 +29,16 @@
 - [x] Controle de acesso RBAC (`user`, `student`, `mod`, `admin`, `super_admin`) e Painel Ministerial (`AdminPanelModal`)
 - [x] Auditoria e sincronização completa de documentação (`README.md`, `website/README.md`, `.agent/`)
 
-## Fase 1 — Setup do Servidor Arcane MP ⏳
-- [ ] Instalar Arcane MP Server no diretório `server/`
-- [ ] Configurar `server.json` (porta 27015, MafiaNet UDP, maxPlayers)
-- [ ] Configurar banco MySQL/MariaDB (via `hmp-mysql`)
+## Fase 1 — Setup do Servidor Arcane MP ✅ (Ambiente Local Operacional)
+- [x] Instalar Arcane MP Server (`1.15.1` / Framework `44.1.1`) no diretório `server/` e launcher em `client/`
+- [x] Configurar `server.json` (porta `27016` UDP/TCP local para evitar conflito com Apple Devices em `27015`, `maxplayers: 32`)
+- [x] Configurar banco MariaDB local (`hogwartsmp` via `hmp-mysql` + usuário dedicado)
+- [x] Instalar HMP Foundations `v0.12.0` (30 resources `hmp-*`) e validar carregamento + migrations (37 tabelas)
+- [x] Criar painel gerenciador `Accio_Server_Manager.bat` com opções de Super Admin, backup e logs
+- [x] Testar inicialização local e conexão do cliente no servidor
 - [ ] Configurar Supabase CLI local (`supabase/`) se necessário para edge functions/migrations
 - [ ] Conectar banco de gameplay com o pipeline de contas aprovadas no Supabase
-- [ ] Endurecer políticas RLS do Supabase antes da abertura pública em larga escala
-- [ ] Testar conexão local básica de rede (MafiaNet UDP)
-- [ ] Instalar HMP Foundations e validar carregamento de resources base
+- [ ] Endurecer políticas RLS do Supabase e atualizar banco para MySQL 8.x / MariaDB 10.6+ antes da abertura pública em larga escala
 
 ## Fase 2 — Core Resources ⏳
 - [ ] Desenvolver `viccs-core` (identidade, permissões, API compartilhada)

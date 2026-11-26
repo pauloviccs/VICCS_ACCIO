@@ -1,5 +1,24 @@
 # Changelog — VICCS Accio HL Server
 
+## [0.2.0] — 2026-11-25
+
+### Servidor ArcaneMP (`server/` + `client/`)
+- **Base do Servidor Instalada e Aberta Localmente:**
+  - Extraídos os binários oficiais **ArcaneMP `1.15.1`** (`b8ce055`, Framework `44.1.1`) em `server/` (`ArcaneMPServer.exe`, `crashpad_handler.exe`, `libnode.dll`) e em `client/` (`ArcaneMPLauncher.exe`).
+  - Instalado pacote oficial **HMP Foundations `v0.12.0`** com todos os 30 resources `hmp-*` em `server/resources/` e 26 configurações em `server/data/` (+ `hmp-mysql.example.json`).
+  - Reparadas tabelas de sistema Aria corrompidas no XAMPP local (`mysql.db`, `mysql.procs_priv`), criado usuário dedicado `hogwartsmp` e gravadas credenciais em `server/data/hmp-mysql.json`.
+  - Validada criação automática das 37 tabelas e 17 migrations em `hogwartsmp`.
+  - Resolvido conflito de download de `.fwpak` causado pelo `AppleMobileDeviceProcess.exe` na porta `127.0.0.1:27015`: alterada a porta do servidor para **`27016`** (UDP+TCP) em `server/server.json` e adicionada checagem automática de conflito de porta.
+  - Criado painel gerenciador **`server/Accio_Server_Manager.bat`** (`server/server-manager.ps1`) com menu amigável, boot com Super Admin (`HMP_ADMIN_BOOTSTRAP_SECRET`), gestão de contas/cargos `admin`, backups `mysqldump`, editor de `server.json` e filtro de logs.
+  - Atualizado `.gitignore` para proteger binários, pacotes `hmp-*`, `.packages/`, `backups/`, `.admin-secret.local`, `server.json`, `data/*.json` e `client/`.
+
+### Plataforma Web (`website/` -> `accio_rp_website.git`)
+- Atualizada lore para os anos 2000 (Diretor Aurelian Vale Diggory), corrigida renderização de avatar do Discord no header, removido isotipo da navbar, ajustado padding das camadas `.frame` e aplicada imagem hero full-bleed (`logohigh_4x.jpg`) com profundidade sutil ao movimento do ponteiro.
+- Integrados os emblemas oficiais das quatro Casas (`public/assets/emblemas/*.png`) nos componentes da UI e no `CastleBanners3D.tsx` em proporção 1:1 sem distorção, com recorte real em alfa na cauda em V e textura de relevo têxtil (`bumpMap`).
+- Subtree `website/` sincronizado com `https://github.com/pauloviccs/accio_rp_website.git` (commit `94e26d8`).
+
+---
+
 ## [0.1.1] — 2026-11-25
 
 ### Documentação & Sincronização

@@ -38,3 +38,23 @@ tmp/
 temp/
 *.tmp
 
+# Servidor Arcane MP (binários proprietários, pacotes third-party, cache e credenciais locais)
+client/
+server/client/
+server/ArcaneMPServer.exe
+server/HogwartsMPServer.exe
+server/crashpad_handler.exe
+server/libnode.*
+server/*.dat
+server/*.bin
+server/*.pak
+server/locales/
+server/.packages/
+server/.admin-secret.local
+server/backups/
+server/server.json
+server/data/*.json
+!server/data/*.example.json
+server/resources/hmp-*/
+
+

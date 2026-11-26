@@ -1,21 +1,18 @@
 # Tarefa Ativa
 
-## Status: 🟢 CONCLUÍDO (Documentação Sincronizada — Pronto para Fase 1)
+## Status: 🟢 FASE 1 CONCLUÍDA (Servidor Base ArcaneMP 1.15.1 Aberto Localmente)
 
 ## Última Fase Entregue
-**Sincronização Geral de Documentação & Consolidação da Plataforma Web (`website/` + `.agent/` + `README.md`)**
+1. **Setup & Abertura Local do Servidor ArcaneMP (`server/` + `client/`):**
+   - Instalado **ArcaneMP `1.15.1`** (`b8ce055`, Framework `44.1.1`) em `server/` (`ArcaneMPServer.exe`, `crashpad_handler.exe`, `libnode.dll`) e cliente em `client/` (`ArcaneMPLauncher.exe`).
+   - Instalado **HMP Foundations `v0.12.0`** completo (30 resources `hmp-*` em `server/resources/` e 26 JSONs em `server/data/`).
+   - Configurado banco local `hogwartsmp` no MariaDB `10.4.32` (XAMPP) com usuário dedicado em `server/data/hmp-mysql.json`, migrando automaticamente 37 tabelas e 17 entradas em `hmp_schema_migrations`.
+   - Porta ajustada para **`27016`** (UDP+TCP) em `server/server.json` devido a conflito local do `AppleMobileDeviceProcess.exe` na porta `127.0.0.1:27015`.
+   - Criado painel administrativo interativo **`Accio_Server_Manager.bat`** (`server/server-manager.ps1`) com modo Super Admin (`HMP_ADMIN_BOOTSTRAP_SECRET`), gestão de cargos no banco, backups `mysqldump`, editor de `server.json`, leitura de logs e verificação de conflito de porta.
+2. **Atualizações & Sincronização do Website (`website/` -> `accio_rp_website.git`):**
+   - Ajustado OAuth Discord, correção de avatar no header, lore anos 2000 (Diretor Aurelian Vale Diggory), hero full-bleed `logohigh_4x.jpg` com parallax por ponteiro, remoção do isotipo no navbar, emblemas oficiais das 4 Casas integrados na UI e em 1:1 sem distorção nos estandartes 3D (`CastleBanners3D.tsx`), e subtree enviado para `accio_rp_website.git` (`94e26d8`).
 
-1. **Plataforma Web de Pré-Registro (`website/`):**
-   - Aplicação React 19 + Vite 6 + TypeScript + Tailwind CSS v4 operacional com 14 componentes em `website/src/components/`.
-   - Motor dinâmico de temas das Quatro Casas (`data-house-theme`), Estandartes 3D em Three.js (`CastleBanners3D`), Carta de Hogwarts 3D (`HogwartsLetterModal`) e criação de personagem em 4 etapas (`WhitelistFormModal`) com 11 famílias de cabos de varinhas em PNG transparente (`public/wands/cutouts/`).
-   - Gerador de pergaminho em PDF (`jsPDF` + `html2canvas`) com upload para o bucket `character_sheets`, envio de Rich Embeds via Discord Webhook, cronômetro sincronizado em Realtime (`AppleTimerModal`) e player de trilha sonora orquestral (`MusicPlayerWidget` com 6 faixas MP3 + SFX procedurais em `audio.ts`).
-2. **Infraestrutura Supabase Oficial (`ACCIO_Rp` — `siwjyavftankitbdagzo`):**
-   - Schema consolidado em `scripts/migration_accio_rp.sql` com tabelas `character_applications`, `accio_settings` e `user_roles`, bucket `character_sheets`, políticas RLS e publicações `supabase_realtime`.
-3. **Auditoria & Sincronização Documental (2026-11-25):**
-   - Atualizados `.agent/overview/PROJECT_STATUS.md`, `.agent/context/*`, `.agent/memory/*`, `.agent/implementation-plans/master-plan.md`, `README.md` e `website/README.md` para refletir 100% do código e assets reais do repositório.
-
-## Próximos Passos (Aguardando Comando)
-- **Fase 1 — Setup do Servidor Arcane MP (`server/`):**
-  - Instalar e configurar o Arcane MP Server no diretório `server/` (atualmente apenas com `.gitkeep`).
-  - Criar `server.json`, instalar HMP Foundations e configurar banco MySQL/MariaDB via `hmp-mysql`.
-  - Conectar o pipeline de contas aprovadas no Supabase (`character_applications`) ao banco de gameplay do servidor.
+## Próximos Passos (Fase 2)
+- Criar os primeiros resources autorais `viccs-core`, `viccs-ui` e `viccs-characters` em `server/resources/`.
+- Conectar aprovação de fichas no Supabase (`character_applications`) ao banco de gameplay (`hogwartsmp`).
+- Antes da abertura pública: migrar o banco de produção para MySQL 8.x / MariaDB 10.6+, configurar `server-token` + `package-secret`, abrir portas UDP/TCP no roteador/firewall e endurecer políticas RLS do Supabase.

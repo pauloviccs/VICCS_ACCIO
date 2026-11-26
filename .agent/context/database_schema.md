@@ -6,29 +6,20 @@
 
 ## Bancos de Dados
 
-### 1. MySQL/MariaDB (Jogo — via hmp-mysql)
+### 1. MySQL/MariaDB (Jogo — via `hmp-mysql` / Foundations v0.12.0)
 
-Usado pelos resources do servidor para persistir dados de gameplay.
+Usado pelos resources do servidor para persistir dados de gameplay no schema `hogwartsmp` (`utf8mb4`).  
+*(Ambiente local atual: XAMPP MariaDB `10.4.32` operando com todas as migrations; produção recomendada: MySQL `8.x` ou MariaDB `10.6+`.)*
 
-#### Tabelas Core (HMP Foundations)
+#### Tabelas Ativas Criadas Automaticamente (37 tabelas, 17 migrations)
 
-```sql
--- Accounts e identidade
-accounts (id, discord_id, created_at, last_login, banned, ban_reason)
-characters (id, account_id, first_name, last_name, house, appearance_data, created_at)
-character_positions (character_id, world, x, y, z, rotation)
-
--- Inventário
-inventories (id, character_id, slot, item_id, quantity, metadata)
-
--- Economia
-wallets (character_id, galleons, sickles, knuts)
-transactions (id, from_character, to_character, amount, type, timestamp)
-
--- Casas
-house_points (house, points, season)
-house_cup_log (id, house, points_change, reason, awarded_by, timestamp)
-```
+Gerenciadas por `hmp_schema_migrations` sem importação manual de DDL:
+- **Core (`hmp-core`):** `hmp_accounts`, `hmp_account_identities`, `hmp_account_groups`, `hmp_account_metadata`, `hmp_characters`, `hmp_character_groups`, `hmp_character_metadata`
+- **Casas (`hmp-houses`):** `hmp_house_memberships`, `hmp_house_membership_audit`, `hmp_house_standings`, `hmp_house_point_transactions`
+- **Inventário & Bestas (`hmp-inventory`, `hmp-beasts`):** `hmp_inventory_items`, `hmp_inventory_containers`, `hmp_inventory_native`, `hmp_beast_bags`
+- **Economia, Lojas, Empregos & Negócios (`hmp-banking`, `hmp-shops`, `hmp-jobs`, `hmp-business`):** `hmp_bank_accounts`, `hmp_bank_transactions`, `hmp_shop_stock`, `hmp_shop_transactions`, `hmp_job_employments`, `hmp_job_audit`, `hmp_business`, `hmp_business_shop`, `hmp_business_offer`, `hmp_business_audit`
+- **Progressão, Mundo & Emotes (`hmp-progression`, `hmp-loot`, `hmp-worldstate`, `hmp-emotes`):** `hmp_progression_profiles`, `hmp_progression_talents`, `hmp_progression_rewards`, `hmp_progression_floo_flames`, `hmp_progression_field_guides`, `hmp_loot_takes`, `hmp_world_state`, `hmp_emote_aliases`
+- **Administração (`hmp-admin`):** `hmp_admin_warnings`, `hmp_admin_bans`, `hmp_admin_audit`
 
 #### Tabelas VICCS Custom (A criar)
 

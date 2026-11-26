@@ -1,150 +1,89 @@
 # Project Overview
 
 ## Project Name
-VICCS Accio — Hogwarts Legacy Roleplay (Arcane MP)
+VICCS Accio — Hogwarts Legacy Roleplay (ArcaneMP)
 
 ## Description
-Servidor de Roleplay MMO-RPG ambientado no universo de Hogwarts Legacy nos anos 2000, desenvolvido sobre o framework Arcane MP (C++ / Node.js) em conjunto com uma plataforma web interativa de pré-registro de pioneiros, admissão ministerial, geração de fichas em pergaminho (PDF), personalização de varinhas canônicas (11 famílias), estandartes 3D, trilha sonora orquestral contextual e gestão em tempo real via Supabase.
+Servidor de Roleplay MMO-RPG ambientado no universo de Hogwarts Legacy nos anos 2000 (logo após a Batalha de Hogwarts, sob a diretoria de Aurelian Vale Diggory), operando localmente sobre o framework **ArcaneMP `1.15.1`** (`Framework 44.1.1`) com **HMP Foundations `v0.12.0`** e banco **MariaDB** (`hogwartsmp`), integrado a uma plataforma web de pré-registro de pioneiros em **React 19 + Vite 6 + TypeScript** (`website/`) conectada ao **Supabase (`ACCIO_Rp`)** e ao **Discord**.
 
 ## Tech Stack
-- **Languages:** TypeScript (~5.7.2), JavaScript (Node.js ES2022+ / CJS), HTML5, CSS3, SQL (PostgreSQL 17 / MySQL-MariaDB)
-- **Frameworks & Libraries (Website):**
-  - Frontend: React 19, Vite 6 (`@vitejs/plugin-react`), Tailwind CSS v4 (`@tailwindcss/vite`), `clsx`, `tailwind-merge`, `lucide-react`
-  - 3D & Efeitos Visuais: Three.js (`three`, `@types/three`), `canvas-confetti`, Canvas 2D (`ParticleCanvas`)
-  - PDF & Exportação: `jspdf`, `html2canvas`
-  - Áudio: Web Audio API (SFX procedurais em `soundManager`) + `HTMLAudioElement` (`musicPlayer` com 6 faixas MP3 e crossfade contextual)
-- **Game Engine (Servidor — Planejado/Fase 1):** Arcane MP Framework (MafiaHub C++ core, Node.js server scripts, V8 sandboxed client scripts, CEF UI)
-- **Tools:**
-  - Git / GitHub (`VICCS_ACCIO.git`)
-  - Python / OpenCV (usado no pipeline de recorte transparente das 11 famílias de cabos de varinhas)
-  - Supabase CLI (pasta `supabase/` reservada)
-- **Services:**
-  - Supabase Cloud (PostgreSQL 17, Supabase Auth OAuth2 Discord, Realtime WebSockets, Storage Bucket `character_sheets`)
-    - Projeto Oficial: `ACCIO_Rp` (Ref: `siwjyavftankitbdagzo`, Região: `sa-east-1`)
-  - Discord API (OAuth2 Provider & Webhook Ministerial com Rich Embeds)
+- **Game Server Runtime (`server/`):**
+  - Engine: ArcaneMP `1.15.1` (`b8ce055`, MafiaHub Framework `44.1.1`, `ArcaneMPServer.exe`, Node.js embarcado `libnode.dll`)
+  - Resource Pack Base: HMP Foundations `v0.12.0` (30 módulos `hmp-*` em `server/resources/` + 26 configs em `server/data/`)
+  - Ferramentas de Gestão: `Accio_Server_Manager.bat` + `server-manager.ps1` (painel Super Admin TUI), `start-server.ps1`
+  - Client Local (`client/`): `ArcaneMPLauncher.exe`, `ArcaneMPClient.dll`, CEF, MafiaHubUpdater
+- **Website (`website/`):**
+  - Languages: TypeScript (`~5.7.2`), HTML5, CSS3
+  - Frameworks & Libraries: React 19, Vite 6 (`@vitejs/plugin-react`), Tailwind CSS v4 (`@tailwindcss/vite`), `lucide-react`, `clsx`, `tailwind-merge`
+  - 3D & Visuais: Three.js (`three`, `@types/three`), `canvas-confetti`, Canvas 2D (`ParticleCanvas`)
+  - PDF & Áudio: `jspdf`, `html2canvas`, Web Audio API (`soundManager`) + `HTMLAudioElement` (`musicPlayer` com 6 faixas MP3)
+- **Databases & Services:**
+  - Gameplay DB (Local Dev): XAMPP **MariaDB `10.4.32`** (`127.0.0.1:3306`, database `hogwartsmp`, 37 tabelas + 17 migrations `hmp_schema_migrations` gerenciadas por `hmp-mysql`; produção recomendada em MySQL 8.x ou MariaDB 10.6+)
+  - Plataforma Web & Auth: **Supabase Cloud** (`ACCIO_Rp`, ref `siwjyavftankitbdagzo`, `sa-east-1`, PostgreSQL 17, OAuth2 Discord, Storage bucket `character_sheets`, Realtime)
+  - Discord API: OAuth2 Provider + Rich Embeds Webhook ministerial
+- **Tools:** Git / GitHub (`VICCS_ACCIO.git` + subtree `accio_rp_website.git`), PowerShell, Python/OpenCV (recorte de varinhas)
 
 ## Folder Structure
 ```text
 VICCS_Accio_HL_Server/
-├── .agent/                               # Cortex do Projeto (Contexto, Memória, Diretrizes e SOPs)
-│   ├── assets/                           # Identidade visual e referências de UI de Hogwarts Legacy
-│   │   ├── AccioRP_Referencias_Interface/ # Capturas de menus, gear, HUD e criação de personagem
-│   │   └── IDV_Logo/                     # Logotipos oficiais (SVG e JPG)
-│   ├── context/                          # Arquitetura, stack tecnológica e schemas de banco
-│   │   ├── architecture.md               # Arquitetura modular Arcane MP + Plataforma Web + Supabase
-│   │   ├── database_schema.md            # Schemas MySQL (planejado) e Supabase (produção)
-│   │   └── stack.md                      # Definição técnica das tecnologias do projeto
-│   ├── global-rules/                     # Regras absolutas de desenvolvimento
-│   │   └── rules.md
-│   ├── guidelines/                       # Guias de estilo, UI/UX e convenções de resources
-│   │   ├── code_style.md
-│   │   ├── resource_conventions.md
-│   │   └── ui_ux.md                      # Diretrizes visuais "Wizarding Elegance"
-│   ├── implementation-plans/             # Planos de implementação executados e roadmap
-│   │   ├── hogwarts-letter-and-clean-discord-plan.md
-│   │   ├── master-plan.md
-│   │   └── website-preregistration-plan.md
-│   ├── memory/                           # Memória operacional e histórico
-│   │   ├── active_task.md                # Estado da tarefa ativa e próximos passos
-│   │   ├── changelog.md                  # Registro cronológico de entregas
-│   │   └── todos.md                      # Checklist mestre de fases e tarefas
-│   ├── overview/                         # Visão consolidada do projeto
-│   │   └── PROJECT_STATUS.md             # Este arquivo
-│   └── skills/                           # SOPs de desenvolvimento dos sistemas e assets
-│       ├── academic-progression.md
-│       ├── admin-anticheat.md
-│       ├── crafting-system.md
-│       ├── create-resource.md
-│       ├── create-ui-panel.md
-│       ├── database-persistence.md
-│       ├── economy-system.md
-│       ├── inter-resource-communication.md
-│       ├── npc-beast-system.md
-│       ├── quest-system.md
-│       ├── social-roleplay.md
-│       ├── spell-system.md
-│       ├── wand-asset-artisan.md         # Especificação das 11 famílias de varinhas de HL
-│       └── world-management.md
-├── scripts/                              # Scripts utilitários e migrações SQL
+├── .agent/                               # Cortex do Projeto (Contexto, Memória, Diretrizes e Skills)
+│   ├── assets/                           # Referências de UI, emblemas originais, IDV_Logo, PSD e referências web
+│   ├── context/                          # architecture.md, stack.md, database_schema.md
+│   ├── global-rules/                     # rules.md
+│   ├── guidelines/                       # code_style.md, resource_conventions.md, ui_ux.md
+│   ├── implementation-plans/             # hogwarts-letter-and-clean-discord-plan.md, master-plan.md, website-preregistration-plan.md
+│   ├── memory/                           # active_task.md, changelog.md, todos.md
+│   ├── overview/                         # PROJECT_STATUS.md
+│   └── skills/                           # 14 SOPs ArcaneMP + wand-asset-artisan.md
+├── client/                               # (Ignorado no Git) Cliente local ArcaneMP 1.15.1 (ArcaneMPLauncher.exe)
+├── scripts/
 │   └── migration_accio_rp.sql            # Script DDL/DML oficial do Supabase ACCIO_Rp
-├── server/                               # (Fase 1 - Pendente) Servidor Arcane MP e resources
-│   └── .gitkeep
-├── supabase/                             # (Fase 1 - Pendente) Configurações locais Supabase CLI
-│   └── .gitkeep
-├── website/                              # Plataforma Web de Pré-Registro e Admissão (React + Vite)
-│   ├── .agent/assets/references/wands/   # 83 assets originais de referência de cabos de varinhas
-│   ├── public/                           # Assets estáticos servidos pelo Vite
-│   │   ├── assets/                       # Identidade visual (accio-roleplay-identidade.svg, logohigh.jpg, logohigh_4x.jpg)
-│   │   ├── audio/                        # 6 faixas MP3 orquestrais de trilha sonora
-│   │   └── wands/                        # 83 arquivos .webp + pasta cutouts/ com 11 PNGs transparentes
-│   ├── src/
-│   │   ├── components/                   # 14 componentes React de UI e 3D
-│   │   │   ├── AdminPanelModal.tsx       # Painel ministerial: revisão de fichas, RBAC e acesso ao timer
-│   │   │   ├── AppleTimerModal.tsx       # Modal de cronômetro estilo iOS sincronizado via Realtime
-│   │   │   ├── CastleBanners3D.tsx       # Estandartes 3D das 4 Casas em Three.js com física de tecido
-│   │   │   ├── EnchantedSubmissionModal.tsx # Transição mágica pós-envio da ficha
-│   │   │   ├── Features.tsx              # Seção de pilares e mecânicas do servidor
-│   │   │   ├── Footer.tsx                # Rodapé institucional
-│   │   │   ├── Hero.tsx                  # Seção principal com contador de vagas e cronômetro
-│   │   │   ├── HogwartsLetterModal.tsx   # Carta de Hogwarts 3D com lacre de cera
-│   │   │   ├── MusicPlayerWidget.tsx     # Player flutuante da trilha sonora (shuffle, volume, playlist)
-│   │   │   ├── Navbar.tsx                # Barra superior com seletor de tema das Casas e acesso RBAC
-│   │   │   ├── ParticleCanvas.tsx        # Partículas estelares dinâmicas em Canvas 2D
-│   │   │   ├── TicketModal.tsx           # Bilhete de Embarque do Expresso de Hogwarts
-│   │   │   ├── ValidationModal.tsx       # Modal de consulta/status da inscrição lavrada
-│   │   │   └── WhitelistFormModal.tsx    # Ficha de criação estilo Hogwarts Legacy (3.000 palavras + PDF)
-│   │   ├── lib/                          # Camada de serviços, áudio, PDF e integrações
-│   │   │   ├── audio.ts                  # `soundManager` (Web Audio API) e `musicPlayer` (MP3 + crossfade)
-│   │   │   ├── constants.ts              # Casas, varinhas (11 famílias), lore Ollivanders, prazos e webhook
-│   │   │   ├── discordWebhook.ts         # Envio de Rich Embeds formatados para o Discord
-│   │   │   ├── pdfGenerator.ts           # Geração de ficha em PDF (`jsPDF` + `html2canvas`) e upload Storage
-│   │   │   └── supabase.ts               # Cliente Supabase, OAuth Discord, CRUD, RBAC e Realtime
-│   │   ├── App.tsx                       # Orquestração de estado, auth, modais e tema dinâmico
-│   │   ├── index.css                     # Tokens Tailwind v4 e variáveis CSS dos 4 temas das Casas
-│   │   ├── main.tsx                      # Entry point React
-│   │   ├── types.ts                      # Interfaces TypeScript compartilhadas
-│   │   └── vite-env.d.ts
-│   ├── .env                              # Variáveis de ambiente locais (não versionado)
-│   ├── .env.example                      # Modelo de configuração do Supabase
-│   ├── index.html
-│   ├── package.json
-│   ├── README.md
-│   ├── tsconfig.app.json / tsconfig.json / tsconfig.node.json
-│   └── vite.config.ts
+├── server/                               # Servidor dedicado ArcaneMP 1.15.1 + HMP Foundations v0.12.0
+│   ├── data/                             # 26 configs hmp-*.json (ignorados no Git) + hmp-mysql.example.json
+│   ├── logs/                             # Logs de execução (hogwarts-mp.log)
+│   ├── resources/                        # 30 resources hmp-* do HMP Foundations v0.12.0 (ignorados no Git)
+│   ├── Accio_Server_Manager.bat          # Painel interativo amigável com ferramentas Super Admin
+│   ├── ArcaneMPServer.exe                # Executável dedicado Windows (ignorado no Git)
+│   ├── README.md                         # Guia de operação local e abertura pública
+│   ├── server-manager.ps1                # Lógica TUI do painel Super Admin, DB, logs, backup e server.json
+│   ├── server.example.json               # Modelo versionado de configuração
+│   ├── server.json                       # Configuração local ativa (porta 27016 UDP/TCP, maxplayers 32)
+│   └── start-server.ps1                  # Launcher CLI com pre-flight de executável, porta e MySQL
+├── supabase/                             # (Reservado) Configurações locais Supabase CLI
+├── website/                              # Plataforma Web de Pré-Registro e Admissão (React 19 + Vite 6)
+│   ├── public/
+│   │   ├── assets/                       # accio-roleplay-identidade.svg, logohigh.jpg, logohigh_4x.jpg + emblemas/*.png
+│   │   ├── audio/                        # 6 faixas MP3 orquestrais
+│   │   └── wands/                        # 83 .webp + cutouts/ com 11 PNGs transparentes
+│   └── src/
+│       ├── components/                   # 15 componentes (AdminPanelModal, AppleTimerModal, ArcaneOrnaments, CastleBanners3D, EnchantedSubmissionModal, Features, Footer, Hero, HogwartsLetterModal, MusicPlayerWidget, Navbar, ParticleCanvas, TicketModal, ValidationModal, WhitelistFormModal)
+│       ├── lib/                          # audio.ts, constants.ts, discordWebhook.ts, pdfGenerator.ts, supabase.ts
+│       ├── App.tsx / index.css / main.tsx / types.ts
 ├── .gitignore
 └── README.md
 ```
 
 ## Current Features Implemented
-1. **Motor Dinâmico de Temas das Quatro Casas:**
-   - Transição visual via CSS Custom Properties (`[data-house-theme]`) para Grifinória, Sonserina, Corvinal e Lufa-Lufa.
-   - Acionável pelos estandartes 3D (`CastleBanners3D`), `Navbar` ou formulário, com persistência em `localStorage` (`accio_house_theme`).
-2. **Experiência de Convocação & Estandartes 3D:**
-   - `HogwartsLetterModal`: carta tridimensional com quebra de lacre de cera e `canvas-confetti` exibida na primeira visita.
-   - `CastleBanners3D`: renderização Three.js das flâmulas das quatro Casas com simulação de tecido ao vento e iluminação de tochas.
-3. **Criação de Personagem & Oficina Ollivanders (`WhitelistFormModal`):**
-   - Fluxo guiado em 4 etapas com seletor de dormitório (`Bruxo/Wizard` vs `Bruxa/Witch`), linhagem (`Sangue Puro`, `Mestiço`, `Nascido Trouxa`) e 11 famílias de cabos de varinhas recortadas em PNG transparente (`public/wands/cutouts/`).
-   - Alternador visual entre `3D Macro` e `Guia de Campo` (sketch em pergaminho), mais os núcleos canônicos e lore de Garrick Ollivanders.
-   - Validador de crônica com mínimo de 3.000 palavras (`MIN_WORDS_BACKSTORY = 3000`) e auto-save em `localStorage`.
-4. **Gerador Oficial de Ficha em PDF (`pdfGenerator.ts`):**
-   - Renderiza pergaminho ministerial A4 via `html2canvas` + `jsPDF`, faz download local e upload automático para o bucket `character_sheets` no Supabase Storage.
-5. **Infraestrutura Supabase (`ACCIO_Rp` — `siwjyavftankitbdagzo`):**
-   - Tabelas ativas via `scripts/migration_accio_rp.sql`: `character_applications`, `accio_settings` e `user_roles`.
-   - Bucket público `character_sheets` (limite 10 MB, `application/pdf`), políticas RLS e publicação `supabase_realtime` para `accio_settings`, `user_roles` e `character_applications`.
-   - RBAC (`user`, `student`, `mod`, `admin`, `super_admin`) com painel de moderação e aprovação em `AdminPanelModal.tsx`.
-6. **Cronômetro em Tempo Real & Integração Discord:**
-   - `AppleTimerModal`: ajuste administrativo da contagem regressiva (padrão de 61 dias em `constants.ts` / `TARGET_PHASE_END_DATE = 2027-01-21T23:59:59.000Z`) com sincronização via `supabase_realtime`.
-   - Autenticação OAuth2 Discord via Supabase Auth e envio automático de Rich Embeds via `discordWebhook.ts`.
-7. **Engine de Áudio (`audio.ts` + `MusicPlayerWidget.tsx`):**
-   - Efeitos sonoros procedurais via Web Audio API (`soundManager`).
-   - Player flutuante para 6 faixas MP3 em `public/audio/` com shuffle, controle de volume e crossfade contextual (`mystical`, `letter`, `creation`, `dungeon`, `express`, `triumph`).
+1. **Servidor ArcaneMP 1.15.1 & HMP Foundations v0.12.0 Operacional (`server/` + `client/`):**
+   - Servidor local testado e aberto com conexão funcional via `ArcaneMPLauncher.exe` em `127.0.0.1:27016` (porta ajustada para `27016` UDP/TCP para evitar conflito local com `AppleMobileDeviceProcess.exe` em `127.0.0.1:27015`).
+   - Banco `hogwartsmp` configurado no MariaDB local (usuário dedicado `hogwartsmp` em `server/data/hmp-mysql.json`) com todas as **37 tabelas** e **17 migrations** criadas automaticamente pelo Foundations.
+   - Todos os **30 resources** `hmp-*` ativos (contas, personagens, casas, inventário com 1.848 definições nativas, spawn, economia/bancos, lojas, feitiços, duelos, bestas, NPCs, Hogwarts Express, admin e webhooks).
+   - Painel gerenciador `server/Accio_Server_Manager.bat` com inicialização normal, inicialização com `HMP_ADMIN_BOOTSTRAP_SECRET` (`/admin`), auto-restart, abertura do launcher, gestão do MySQL XAMPP, promoção de cargos `admin` (grades 1–3), backups via `mysqldump`, editor de `server.json`, inspeção de logs e detecção prévia de conflito de porta.
+2. **Plataforma Web de Pré-Registro (`website/`, sincronizada com `accio_rp_website.git`):**
+   - Motor dinâmico de temas das 4 Casas (`[data-house-theme]`), identidade visual ArcaneMP com ornamentos chanfrados (`ArcaneOrnaments`) e fundo hero full-bleed (`logohigh_4x.jpg`) com efeito de profundidade por ponteiro.
+   - Estandartes 3D em Three.js (`CastleBanners3D`) usando os emblemas oficiais em PNG (`public/assets/emblemas/*.png`) em proporção 1:1 sem distorção, recorte real em alfa na cauda em V e relevo têxtil (`bumpMap`).
+   - Carta de Hogwarts 3D ambientada nos anos 2000 (Diretor Aurelian Vale Diggory), criação de personagem em 4 etapas (`WhitelistFormModal`) com 11 famílias de cabos em PNG transparente, gerador de ficha PDF (`jsPDF` + `html2canvas`), trilha sonora MP3 + SFX, cronômetro Realtime (`AppleTimerModal`), autenticação Discord OAuth2, Webhook Discord e Painel Admin Ministerial (`AdminPanelModal`).
 
 ## Work in Progress / Known Gaps
-- `server/`: Contém apenas `.gitkeep`; o runtime Arcane MP, `server.json`, HMP Foundations e os resources `viccs-*` ainda não foram instalados/criados.
-- `supabase/`: Contém apenas `.gitkeep`; migrations são gerenciadas atualmente pelo script SQL em `scripts/migration_accio_rp.sql`.
-- Banco relacional MySQL/MariaDB de gameplay (`hmp-mysql`) e conector de sincronização com contas aprovadas no Supabase ainda pendentes (Fase 1).
-- As políticas RLS atuais em `scripts/migration_accio_rp.sql` permitem leitura/escrita pública nas tabelas iniciais de pré-registro e devem ser endurecidas antes do ambiente final de produção do servidor.
+- **Resources Customizados VICCS (Fase 2+):** pasta `server/resources/` contém apenas os 30 módulos base `hmp-*`; os resources autorais (`viccs-core`, `viccs-ui`, `viccs-characters`, `viccs-spells`, etc.) ainda serão desenvolvidos.
+- **Ponte Supabase ↔ Gameplay:** sincronização automática das fichas aprovadas em `public.character_applications` (Supabase) para `hogwartsmp` (MySQL/MariaDB) ainda não implementada.
+- **Segurança & Infraestrutura antes da abertura pública:**
+  - Atualizar banco de produção para **MySQL 8.x** ou **MariaDB 10.6+** (ambiente dev atual usa XAMPP MariaDB `10.4.32`).
+  - Definir `server-token` (MafiaHub) e `package-secret` em `server/server.json`, além de liberar porta do servidor em UDP e TCP no firewall/roteador.
+  - Endurecer políticas RLS do Supabase e mover a URL do Discord Webhook (`website/src/lib/constants.ts`) para Edge Function / variável server-side.
+  - Pasta `supabase/` ainda contém apenas `.gitkeep`.
 
 ## Next Steps
-1. Iniciar a **Fase 1**: instalar e configurar o Arcane MP Server em `server/` (`server.json`, MafiaNet UDP porta 27015, HMP Foundations e `hmp-mysql`).
-2. Desenvolver os resources base da **Fase 2** (`viccs-core`, `viccs-ui`, `viccs-characters`) integrando as fichas aprovadas do Supabase com o servidor de jogo.
+1. Iniciar a **Fase 2**: criar os primeiros resources autorais `viccs-core`, `viccs-ui` e `viccs-characters` seguindo `.agent/guidelines/resource_conventions.md`.
+2. Implementar a integração entre fichas aprovadas no Supabase (`ACCIO_Rp`) e criação/vínculo de personagens no servidor ArcaneMP.
+3. Preparar banco MySQL 8.x / MariaDB 10.6+ dedicado, `server-token` e liberação de rede para abertura pública de testes.

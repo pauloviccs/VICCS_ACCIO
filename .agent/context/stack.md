@@ -4,7 +4,8 @@
 
 | Camada | Tecnologia | Versão | Notas |
 |--------|-----------|--------|-------|
-| Framework Core | Arcane MP (MafiaHub) | Latest | Framework C++ com hooks no Hogwarts Legacy |
+| Framework Core | Arcane MP (MafiaHub) | 1.15.1 (FW 44.1.1) | Framework C++ com hooks no Hogwarts Legacy |
+| HMP Foundations | Base Resources (`hmp-*`) | v0.12.0 | 30 resources em `server/resources/` |
 | Server Runtime | Node.js | 18+ LTS | Runtime dos serverScripts |
 | Client Runtime | V8 (Sandboxed) | Embarcado | Execução isolada no cliente |
 | UI Framework | CEF (Chromium) | Embarcado | Renderiza HTML/CSS/JS sobre o jogo |
@@ -72,8 +73,8 @@ Resources padrão do Arcane MP que utilizamos como fundação:
 
 | Aspecto | Detalhe |
 |---------|---------|
-| Protocolo | MafiaNet (UDP confiável/não-confiável) |
-| Porta padrão | 27015 |
+| Protocolo | MafiaNet (UDP) + HTTP/TCP | Mesma porta para jogo e download de `.fwpak` |
+| Porta | 27016 (Dev Local) / 27015 (Padrão) | Porta local alterada para 27016 para evitar conflito com `AppleMobileDeviceProcess.exe` em `127.0.0.1:27015` |
 | Replicação | Interest-based spatial grid |
 | VoIP | Proximity Voice (Opus, server-relayed) |
 | Instâncias | Virtual Worlds para isolamento |

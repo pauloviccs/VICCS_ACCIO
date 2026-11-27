@@ -4,8 +4,8 @@
 
 ```
 Fase 0 ✅  Biblioteca de Contexto (.agent cortex)
-Fase 1 ⏳  Setup do Servidor e Infraestrutura (Arcane MP em server/; Supabase ACCIO_Rp ✅)
-Fase 2 ⏳  Core Resources (fundação do ecossistema)
+Fase 1 ✅/⏳ Setup do Servidor e Infraestrutura (Arcane MP local operacional em server/ + MariaDB ✅; hardening de produção ⏳; Supabase ACCIO_Rp ✅)
+Fase 2 🟡  Core Resources (viccs-core, viccs-ui, viccs-characters, viccs-sorting + Ponte Universal + PT-BR implementados; em validação ao vivo)
 Fase 3 ⏳  Sistemas de Gameplay (mecânicas principais)
 Fase 4 ⏳  Mundo e Imersão (NPCs, beasts, world)
 Fase 5 ✅/⏳ Administração e Plataforma Web (Website Pré-Registro & Painel Admin Web ✅; viccs-admin ⏳)
@@ -149,3 +149,20 @@ Fase 6 ⏳  Polish, Testes e Launch
 5. Iteração baseada em feedback
 6. Launch público
 
+
+
+---
+
+## Gate Obrigatório de Imersão & UX (Fases 2 a 6)
+
+Todo módulo construído a partir da Fase 2 até a Fase 6 **DEVE** cumprir `server/.agent/scripting/regras-de-implementacao-experiencia-imersiva-accio.md`:
+
+1. **Separação Rígida `Alt` vs `Esc`:**
+   - **`Alt` (Olho Mágico):** exclusivamente observação e mira de alvos no mundo (sem travar câmera ou controles, sem exibir menus de sistemas pessoais, sempre validando estado no servidor em `Disponível` / `Indisponível` / `Bloqueado`). Novos resources (Aulas em Fase 4, Duelos/Lojas em Fase 3/5, Eventos em Fase 6) usam `viccs-ui.eye.registerTargetProvider(...)`.
+   - **`Esc` (Livro do Jogador):** único hub pessoal do jogador. Novos systems/features nas Fases 3 a 6 expõem suas páginas no Livro via `viccs-ui.book.registerPageProvider(...)`, ocultando páginas indisponíveis e exibindo estado atual + próximo passo + requisito faltante. Nunca criar novos atalhos ou menus soltos concorrentes.
+2. **6 Perguntas Obrigatórias antes de implementar qualquer sistema/tela:**
+   - Objetivo único, informação em 3 segundos, ação principal + controle, entrada/confirmação/saída sem conflito, comportamento em falha/ausência de requisito, e coerência de texto/visual/áudio/era.
+3. **Continuidade e Recuperação Segura:**
+   - Nenhuma falha parcial pode perder progresso persistido, prender controles/fade, repetir etapas já concluídas ao reconectar ou sobrescrever itens/vestes equipados manualmente pelo jogador.
+4. **Acessibilidade & Áudio:**
+   - Navegação por teclado, foco claro, alvos clicáveis >= `44px`, respeito a `@media (prefers-reduced-motion: reduce)` e feedback sonoro `hmp-audio` estritamente one-shot e leve.

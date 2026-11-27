@@ -1,0 +1,53 @@
+{
+  "name": "viccs-ui",
+  "version": "1.0.0",
+  "author": "VICCS Team",
+  "description": "Kit visual e sonoro compartilhado do ecossistema VICCS Accio (tokens ArcaneMP + website, ornamentos SVG, cortina de fade, Olho Magico Alt, cartas em pergaminho e Wwise seguro).",
+  "license": "MIT",
+  "mafiahub": {
+    "serverScripts": [
+      "server/main.js"
+    ],
+    "clientScripts": [
+      "client/main.js"
+    ],
+    "files": [
+      "client/main.js",
+      "ui/**/*"
+    ],
+    "exports": [
+      "notify",
+      "parchment",
+      "fade",
+      "houseTheme",
+      "audioCue",
+      "eye",
+      "book",
+      "status"
+    ],
+    "resourceDependencies": [
+      {
+        "name": "hmp-lib",
+        "version": "0.12.0"
+      },
+      {
+        "name": "hmp-ui",
+        "version": "0.12.0"
+      },
+      {
+        "name": "hmp-audio",
+        "version": "0.12.0"
+      },
+      {
+        "name": "hmp-houses",
+        "version": "0.12.0"
+      },
+      {
+        "name": "viccs-core",
+        "version": "1.0.0"
+      }
+    ],
+    "errorBehavior": "stop",
+    "priority": 25
+  }
+}

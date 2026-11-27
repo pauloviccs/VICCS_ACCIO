@@ -1,0 +1,248 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    pointer-events: none;
+    overflow: hidden;
+    user-select: none;
+}
+
+.eye-hud {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    display: grid;
+    place-items: center;
+}
+
+.eye-hud.hidden {
+    display: none;
+}
+
+/* ── Retícula Central (Sem bloqueio de câmera) ── */
+.reticle {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 46px;
+    height: 46px;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    transition: transform 0.16s var(--ease-arcane), opacity 0.16s ease;
+}
+
+.reticle-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(234, 214, 166, 0.42);
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.45);
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s var(--ease-arcane);
+}
+
+.reticle-pip {
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    background: rgba(234, 214, 166, 0.85);
+    box-shadow: 0 0 8px rgba(234, 214, 166, 0.55);
+    transition: background-color 0.16s ease, transform 0.16s var(--ease-arcane);
+}
+
+.reticle.is-available .reticle-ring {
+    border-color: var(--house-accent-secondary);
+    box-shadow: 0 0 18px var(--house-glow);
+    transform: scale(1.08);
+}
+
+.reticle.is-available .reticle-pip {
+    background: var(--house-accent-secondary);
+    transform: rotate(45deg) scale(1.25);
+}
+
+.reticle.is-unavailable .reticle-ring {
+    border-color: rgba(244, 188, 102, 0.65);
+}
+
+.reticle.is-unavailable .reticle-pip {
+    background: #f4bc66;
+}
+
+.reticle.is-blocked .reticle-ring {
+    border-color: rgba(217, 94, 94, 0.72);
+}
+
+.reticle.is-blocked .reticle-pip {
+    background: #e17878;
+}
+
+/* ── Pill Compacto abaixo da Mira ── */
+.callout {
+    position: fixed;
+    top: calc(50% + 36px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 240px;
+    max-width: min(380px, 84vw);
+    padding: 9px 14px;
+    background: rgba(9, 14, 23, 0.86);
+    border: 1px solid var(--hair);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.62);
+    backdrop-filter: blur(12px);
+    pointer-events: none;
+    transition: border-color 0.16s ease, opacity 0.16s ease;
+}
+
+.callout.is-available {
+    border-color: var(--house-border-strong);
+}
+
+.callout.is-unavailable {
+    border-color: rgba(244, 188, 102, 0.52);
+}
+
+.callout.is-blocked {
+    border-color: rgba(217, 94, 94, 0.58);
+}
+
+.callout-idle-msg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--color-muted);
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
+.callout-idle-msg.hidden,
+.callout-target.hidden,
+.target-reason.hidden,
+.eye-feedback.hidden {
+    display: none;
+}
+
+.callout-target {
+    display: grid;
+    gap: 6px;
+}
+
+.callout-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.target-name {
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--color-ink);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.state-pill {
+    flex: none;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+}
+
+.state-pill.available {
+    color: #9de0a8;
+    background: rgba(58, 140, 82, 0.22);
+}
+
+.state-pill.unavailable {
+    color: #f6ca7c;
+    background: rgba(173, 120, 34, 0.22);
+}
+
+.state-pill.blocked {
+    color: #f19999;
+    background: rgba(154, 48, 48, 0.24);
+}
+
+.callout-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.keycap,
+.keycap-mini {
+    display: inline-grid;
+    place-items: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 7px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid var(--house-border-strong);
+    color: var(--house-accent);
+    background: rgba(201, 176, 122, 0.14);
+}
+
+.keycap-mini {
+    min-width: auto;
+    height: 20px;
+    font-size: 10px;
+}
+
+.keycap.is-disabled {
+    opacity: 0.45;
+    border-color: var(--hair-soft);
+    color: var(--color-subtle);
+}
+
+.target-action {
+    flex: 1;
+    color: var(--color-ink);
+}
+
+.target-distance {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-subtle);
+}
+
+.target-reason {
+    font-size: 12px;
+    color: #f0b59c;
+    line-height: 1.35;
+}
+
+.eye-feedback {
+    position: fixed;
+    top: calc(50% + 128px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    background: rgba(24, 12, 16, 0.92);
+    border: 1px solid rgba(217, 94, 94, 0.65);
+    color: #f7c9c9;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reticle,
+    .reticle-ring,
+    .reticle-pip,
+    .callout {
+        transition: none;
+    }
+}

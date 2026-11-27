@@ -21,7 +21,19 @@ Gerenciadas por `hmp_schema_migrations` sem importação manual de DDL:
 - **Progressão, Mundo & Emotes (`hmp-progression`, `hmp-loot`, `hmp-worldstate`, `hmp-emotes`):** `hmp_progression_profiles`, `hmp_progression_talents`, `hmp_progression_rewards`, `hmp_progression_floo_flames`, `hmp_progression_field_guides`, `hmp_loot_takes`, `hmp_world_state`, `hmp_emote_aliases`
 - **Administração (`hmp-admin`):** `hmp_admin_warnings`, `hmp_admin_bans`, `hmp_admin_audit`
 
-#### Tabelas VICCS Custom (A criar)
+#### Tabelas VICCS Fase 2 Ativas (5 tabelas via `MySQL.migrate`)
+
+Criadas automaticamente pelos resources autorais no boot do servidor:
+- **`viccs-core`:**
+  - `viccs_audit` (`id`, `resource`, `action`, `actor_character_id`, `actor_name`, `target_character_id`, `reason`, `before_json`, `after_json`, `created_at`)
+  - `viccs_era_state` (`id`, `era_id`, `academic_year`, `headmaster`, `term`, `updated_at`)
+- **`viccs-characters`:**
+  - `viccs_character_profiles` (`character_id` PK, `supabase_application_id` UNIQUE via `idx_viccs_profiles_app_unique`, `discord_id`, `full_name`, `birth_date`, `birth_place`, `blood_status`, `academic_year`, `patronus`, `character_backstory`, `house`, `secondary_house`, `hatstall`, `sorted_at`, `intro_completed`, `created_at`, `updated_at`)
+  - `viccs_character_wands` (`character_id` PK, `wood`, `core`, `length`, `flexibility`, `handle_id`, `chosen_at`, `updated_at`)
+- **`viccs-sorting`:**
+  - `viccs_sorting_sessions` (`character_id` PK, `status`, `question_ids_json`, `option_tokens_json`, `current_index`, `scores_json`, `is_hatstall`, `primary_house`, `secondary_house`, `score_diff`, `started_at`, `completed_at`, `updated_at`)
+
+#### Tabelas VICCS Custom (Fases 3–4 — A criar)
 
 ```sql
 -- Sistema de Magia
@@ -90,7 +102,12 @@ CREATE TABLE public.character_applications (
     status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'approved', 'rejected' (e 'revision_requested' previsto no frontend)
     reviewer_notes TEXT,
     reviewed_by TEXT,
-    pdf_url TEXT                      -- Link público do pergaminho em PDF
+    pdf_url TEXT,                     -- Link público do pergaminho em PDF
+    sorted_house TEXT,                -- Sincronizado pelo servidor após Chapéu Seletor
+    secondary_house TEXT,
+    is_hatstall BOOLEAN NOT NULL DEFAULT false,
+    sorted_at TIMESTAMPTZ,
+    game_character_id BIGINT
 );
 
 -- Índices ativos:
@@ -117,6 +134,29 @@ CREATE TABLE public.user_roles (
     role TEXT NOT NULL DEFAULT 'user', -- 'user', 'student', 'mod', 'admin', 'super_admin'
     assigned_by TEXT DEFAULT 'Sistema'
 );
+
+-- 4. Ponte Segura Jogo <-> Site (Anti-Spoofing Tickets & Códigos Direct Connect)
+CREATE TABLE public.server_join_tickets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    token_hash TEXT NOT NULL UNIQUE,
+    discord_id TEXT NOT NULL,
+    application_id UUID REFERENCES public.character_applications(id) ON DELETE SET NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE public.server_link_codes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    code TEXT NOT NULL UNIQUE,        -- Ex.: ACCIO-A1B2C3D4
+    discord_id TEXT NOT NULL,
+    application_id UUID REFERENCES public.character_applications(id) ON DELETE SET NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+-- RLS ativado sem políticas para anon/authenticated (acesso exclusivo via service_role).
+-- RPC autenticada: public.issue_server_link_code() (SECURITY DEFINER, 10 min de validade).
 ```
 
 #### Storage Buckets (Supabase Storage)
@@ -137,3 +177,8 @@ CREATE TABLE public.user_roles (
 - **Soft deletes**: campo `deleted_at` NULLABLE quando necessário
 - **JSON data**: tipo TEXT com JSON serializado para dados flexíveis (appearance, furniture, layout)
 
+
+
+### Migração v3 (`viccs-characters` -> MariaDB `viccs_character_profiles`)
+- `robes_house VARCHAR(24) NULL`: última Casa sincronizada com as vestes escolares.
+- `robes_applied TINYINT(1) NOT NULL DEFAULT 0`: indica se o uniforme escolar/vestes foi aplicado com sucesso no inventário nativo sem sobrescrever outros equipamentos manuais.

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR" data-house-theme="gryffindor">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACCIO — Livro do Jogador</title>
+    <link rel="stylesheet" href="fw://resources/viccs-ui/ui/tokens.css" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div id="book-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="book-title">
+        <section id="book-panel" class="frame book-shell">
+            <header class="book-header">
+                <div class="book-identity">
+                    <img id="book-emblem" class="book-emblem hidden" alt="" />
+                    <div>
+                        <p class="eyebrow">Tomo Pessoal de Hogwarts</p>
+                        <h1 id="book-title" class="title book-title">Livro do Jogador</h1>
+                        <p id="book-subtitle" class="book-subtitle"></p>
+                    </div>
+                </div>
+                <button type="button" id="btn-book-close" class="btn-secondary btn-close" aria-label="Fechar Livro do Jogador">
+                    <span>Fechar</span>
+                    <kbd class="kbd-inline">ESC</kbd>
+                </button>
+            </header>
+
+            <div id="book-divider"></div>
+
+            <div class="book-layout">
+                <nav id="book-nav" class="book-nav" role="tablist" aria-label="Páginas do Livro"></nav>
+
+                <main id="book-page" class="book-page" role="tabpanel" tabindex="-1">
+                    <div id="book-alerts" class="book-alerts hidden"></div>
+
+                    <div class="page-head">
+                        <div>
+                            <p id="page-eyebrow" class="eyebrow"></p>
+                            <h2 id="page-title" class="page-title"></h2>
+                        </div>
+                        <span id="page-badge" class="page-badge hidden"></span>
+                    </div>
+
+                    <p id="page-status" class="page-status"></p>
+                    <p id="page-missing" class="page-missing hidden"></p>
+
+                    <div id="page-stats" class="stats-grid"></div>
+                    <div id="page-standings" class="standings-box hidden"></div>
+                    <div id="page-tags" class="tags-wrap hidden"></div>
+                    <div id="page-actions" class="page-actions"></div>
+                </main>
+            </div>
+
+            <footer class="book-footer">
+                <div class="controls-legend">
+                    <span><kbd class="kbd-inline">ALT</kbd> Olho Mágico (Mundo)</span>
+                    <span><kbd class="kbd-inline">ESC</kbd> Livro do Jogador</span>
+                    <span><kbd class="kbd-inline">F</kbd> Confirmar no Olho</span>
+                </div>
+                <p id="book-feedback" class="book-feedback hidden" aria-live="polite"></p>
+            </footer>
+        </section>
+    </div>
+
+    <script src="fw://resources/viccs-ui/ui/ornaments.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+

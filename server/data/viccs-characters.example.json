@@ -1,0 +1,23 @@
+{
+    "$description": "Override opcional do viccs-characters. Copie para server/data/viccs-characters.json e nunca comite chaves privadas.",
+    "featureToggles": {
+        "supabaseSync": false,
+        "autoApplyHouseFromWhitelist": false,
+        "requireWhitelistVerification": false,
+        "allowAssertedDiscordInDev": true,
+        "autoShowSheetAfterSorting": true,
+        "showControlsIntroAfterOnboarding": true,
+        "enablePlayerCommands": false
+    },
+    "houseRobes": {
+        "autoApplyOnSorting": true,
+        "restoreOnCharacterLoaded": true,
+        "outfitItemId": "Outfit_001_Basic",
+        "backItemId": "Back_001_Basic"
+    },
+    "supabase": {
+        "url": "https://seu-projeto.supabase.co",
+        "serviceRoleKey": "",
+        "timeoutMs": 6000
+    }
+}

@@ -1,0 +1,235 @@
+{
+    "$schema": "viccs-config",
+    "$resource": "viccs-sorting",
+    "$version": "1.0.0",
+    "$description": "Banco de dilemas, pesos psicologicos, limiar de Hatstall e metadados da Cerimonia do Chapeu Seletor.",
+
+    "featureToggles": {
+        "enabled": true,
+        "debugMode": false,
+        "announceVerdictToAll": true,
+        "autoStartOnOnboarding": true,
+        "enablePlayerCommands": false
+    },
+
+    "ceremonyLocation": {
+        "// nota": "Teleporta alunos sem Casa automaticamente ao Salao Principal (via fastTravel nativo FT_HW_GreatHall ou coordinates {x,y,z,yaw}) antes da Selecao.",
+        "enabled": true,
+        "fastTravelId": "FT_HW_GreatHall",
+        "coordinates": null,
+        "timeoutMs": 12000,
+        "settleMs": 450,
+        "alreadyThereRadiusCm": 3000
+    },
+
+    "rules": {
+        "// questionsPerSession": "Quantidade de perguntas sorteadas por cerimonia (deve ser <= questionBank.length).",
+        "questionsPerSession": 8,
+        "// hatstallThreshold": "Diferenca maxima entre 1a e 2a casa para acionar Hatstall.",
+        "hatstallThreshold": 1.6,
+        "// deliberationMs": "Tempo de deliberacao antes do veredito (2200-2600 ms).",
+        "deliberationMs": 2400,
+        "// rateLimitWindowMs": "Janela anti-spam de respostas em ms.",
+        "rateLimitWindowMs": 1000,
+        "rateLimitMaxRequests": 4
+    },
+
+    "whispers": [
+        "Hmm... interessante...",
+        "Vejo mais do que você deixa transparecer...",
+        "Onde devo colocá-lo? Difícil... muito difícil...",
+        "Há coragem aqui, mas também uma mente inquieta...",
+        "Não tenha pressa... eu conheço cada corredor deste castelo."
+    ],
+
+    "houses": {
+        "G": {
+            "slug": "gryffindor",
+            "name": "Grifinória",
+            "motto": "Onde habitam os corações indômitos",
+            "welcomeTitle": "Bem-vindo à Casa dos Corajosos",
+            "letterParagraphs": [
+                "O Chapéu Seletor enxergou em você a chama que não recua diante do desconhecido. Sua casa será a Torre da Grifinória, onde ousadia e honra caminham juntas.",
+                "Suba as escadarias móveis, apresente a senha ao retrato da Mulher Gorda e ocupe seu lugar à mesa escarlate e dourada."
+            ]
+        },
+        "R": {
+            "slug": "ravenclaw",
+            "name": "Corvinal",
+            "motto": "O espírito sem limites é o maior tesouro",
+            "welcomeTitle": "Bem-vindo à Casa dos Sábios",
+            "letterParagraphs": [
+                "Sua mente busca padrões, enigmas e verdades que escapam aos apressados. O Chapéu Seletor confiou seu destino à Torre da Corvinal.",
+                "Lembre-se: na porta da nossa sala comunal não há senhas — apenas a aldrava de bronze e uma pergunta digna da sua curiosidade."
+            ]
+        },
+        "H": {
+            "slug": "hufflepuff",
+            "name": "Lufa-Lufa",
+            "motto": "Onde a lealdade e o esforço imperam",
+            "welcomeTitle": "Bem-vindo à Casa dos Leais",
+            "letterParagraphs": [
+                "Firmeza silenciosa, justiça e devoção verdadeira aos que caminham ao seu lado foram decisivos na escolha do Chapéu Seletor.",
+                "Seu lar fica no subsolo acolhedor perto das cozinhas de Hogwarts — onde a mesa nunca está vazia e ninguém é deixado para trás."
+            ]
+        },
+        "S": {
+            "slug": "slytherin",
+            "name": "Sonserina",
+            "motto": "Aqueles de grande ambição e astúcia",
+            "welcomeTitle": "Bem-vindo à Casa dos Ambiciosos",
+            "letterParagraphs": [
+                "Visão estratégica, autocontrole e determinação para moldar o próprio destino guiaram o veredito do Chapéu Seletor para as masmorras da Sonserina.",
+                "Sob as águas tranquilas do Lago Negro, você encontrará aliados que compreendem o valor da excelência e da grandeza."
+            ]
+        }
+    },
+
+    "questionBank": [
+        {
+            "id": "q_instinct",
+            "category": "Instinto & Reação",
+            "text": "Ao caminhar por um corredor deserto ao anoitecer, você ouve passos apressados e um sussurro tenso vindo de trás de uma tapeçaria. Qual é sua reação imediata?",
+            "options": [
+                { "text": "Afasto a tapeçaria sem hesitar para confrontar quem está ali antes que fuja.", "weights": { "G": 2.4, "S": 0.7, "R": 0.2, "H": 0.1 } },
+                { "text": "Fico imóvel nas sombras e escuto em silêncio para descobrir o assunto antes de agir.", "weights": { "S": 2.1, "R": 1.1, "G": 0.2, "H": 0.1 } },
+                { "text": "Observo o padrão das pegadas e a acústica do corredor para deduzir quantas pessoas são.", "weights": { "R": 2.3, "S": 0.8, "H": 0.2, "G": 0.1 } },
+                { "text": "Pergunto em voz calma se alguém precisa de ajuda ou está perdido.", "weights": { "H": 2.4, "G": 0.8, "R": 0.2, "S": 0.0 } }
+            ]
+        },
+        {
+            "id": "q_nature",
+            "category": "Natureza & Contemplação",
+            "text": "Entre estas quatro paisagens silenciosas, qual delas desperta uma sensação imediata de pertencimento em você?",
+            "options": [
+                { "text": "O topo de um penhasco varrido pelo vento, onde o horizonte parece infinito.", "weights": { "R": 1.9, "G": 1.3, "S": 0.2, "H": 0.1 } },
+                { "text": "Uma clareira iluminada pelo sol da manhã, cercada por árvores antigas e tranquilas.", "weights": { "H": 2.3, "G": 0.6, "R": 0.4, "S": 0.1 } },
+                { "text": "As profundezas de um lago escuro e calmo, onde a luz mal toca a superfície.", "weights": { "S": 2.2, "R": 1.0, "H": 0.2, "G": 0.1 } },
+                { "text": "Uma floresta densa e selvagem ao entardecer, cheia de trilhas desconhecidas.", "weights": { "G": 2.2, "R": 0.7, "S": 0.4, "H": 0.2 } }
+            ]
+        },
+        {
+            "id": "q_moral",
+            "category": "Dilema Moral",
+            "text": "Um amigo próximo cometeu um erro grave que pode prejudicar outra pessoa inocente, mas pede que você guarde segredo absoluto. O que você faz?",
+            "options": [
+                { "text": "Convenço meu amigo a assumir a responsabilidade junto comigo, custe o que custar.", "weights": { "G": 2.1, "H": 1.2, "R": 0.2, "S": 0.0 } },
+                { "text": "Mantenho o segredo dele, mas intervenho discretamente para impedir que o inocente sofra.", "weights": { "S": 2.0, "H": 1.1, "R": 0.5, "G": 0.1 } },
+                { "text": "Não traio a confiança do meu amigo diretamente, mas busco uma solução justa para reparar o dano.", "weights": { "H": 2.2, "S": 0.7, "R": 0.4, "G": 0.2 } },
+                { "text": "Analiso todas as consequências lógicas antes de decidir qual princípio deve prevalecer.", "weights": { "R": 2.3, "S": 0.7, "H": 0.3, "G": 0.1 } }
+            ]
+        },
+        {
+            "id": "q_artifacts",
+            "category": "Artefatos Antigos",
+            "text": "Sobre uma mesa de pedra antiga repousam quatro objetos sem qualquer inscrição. Qual chama sua atenção primeiro?",
+            "options": [
+                { "text": "Uma ampulheta cuja areia parece subir lentamente em vez de cair.", "weights": { "R": 2.2, "S": 0.9, "H": 0.2, "G": 0.1 } },
+                { "text": "Uma adaga de prata embainhada, marcada por sinais de antigas batalhas.", "weights": { "G": 2.3, "S": 0.8, "H": 0.1, "R": 0.2 } },
+                { "text": "Um anel pesado com uma pedra escura que parece aquecer ao se aproximar.", "weights": { "S": 2.3, "G": 0.6, "R": 0.4, "H": 0.1 } },
+                { "text": "Um cálice simples de bronze polido pelo toque de muitas gerações.", "weights": { "H": 2.3, "G": 0.6, "R": 0.3, "S": 0.2 } }
+            ]
+        },
+        {
+            "id": "q_potion",
+            "category": "O Espelho da Mente",
+            "text": "Se você pudesse beber apenas uma poção única na vida, qual efeito escolheria?",
+            "options": [
+                { "text": "A clareza absoluta para compreender qualquer enigma ou verdade oculta.", "weights": { "R": 2.4, "S": 0.7, "H": 0.2, "G": 0.1 } },
+                { "text": "A capacidade de inspirar confiança e unir pessoas em torno de um propósito.", "weights": { "H": 1.9, "G": 1.1, "S": 0.5, "R": 0.1 } },
+                { "text": "A determinação inabalável para realizar sua maior ambição sem jamais vacilar.", "weights": { "S": 2.3, "G": 0.8, "R": 0.3, "H": 0.0 } },
+                { "text": "A audácia pura para enfrentar o impossível sem sentir medo.", "weights": { "G": 2.4, "S": 0.6, "H": 0.3, "R": 0.1 } }
+            ]
+        },
+        {
+            "id": "q_strategy",
+            "category": "Conflito & Estratégia",
+            "text": "Durante uma competição difícil em equipe, você percebe que o plano atual vai falhar. Como você age?",
+            "options": [
+                { "text": "Assumo a linha de frente e improviso uma jogada ousada para virar o jogo.", "weights": { "G": 2.3, "S": 0.7, "H": 0.2, "R": 0.2 } },
+                { "text": "Reorganizo silenciosamente os papéis do grupo para explorar a fraqueza do adversário.", "weights": { "S": 2.3, "R": 0.9, "G": 0.2, "H": 0.1 } },
+                { "text": "Aponto a falha lógica no plano e proponho uma alternativa mais eficiente.", "weights": { "R": 2.3, "S": 0.7, "H": 0.3, "G": 0.1 } },
+                { "text": "Garanto que ninguém desanime e cubro as falhas dos colegas para mantermos o ritmo.", "weights": { "H": 2.4, "G": 0.7, "R": 0.2, "S": 0.1 } }
+            ]
+        },
+        {
+            "id": "q_legacy",
+            "category": "Memória & Legado",
+            "text": "Quando pessoas que convivem com você falam ao seu respeito quando você não está presente, o que você mais gostaria que dissessem?",
+            "options": [
+                { "text": "Que você nunca abandonou alguém quando as coisas ficaram difíceis.", "weights": { "H": 2.2, "G": 1.1, "R": 0.1, "S": 0.1 } },
+                { "text": "Que você sempre enxergava soluções que ninguém mais conseguia ver.", "weights": { "R": 2.3, "S": 0.8, "H": 0.2, "G": 0.1 } },
+                { "text": "Que você teve coragem de fazer o que era certo mesmo estando sozinho.", "weights": { "G": 2.4, "H": 0.7, "R": 0.2, "S": 0.1 } },
+                { "text": "Que você sabia exatamente onde queria chegar e conquistou seu lugar.", "weights": { "S": 2.4, "R": 0.6, "G": 0.4, "H": 0.0 } }
+            ]
+        },
+        {
+            "id": "q_fork",
+            "category": "O Caminho Bifurcado",
+            "text": "Você está diante de duas portas fechadas: uma exige resolver um enigma complexo; a outra exige atravessar uma ponte estreita sobre um abismo. Qual você escolhe?",
+            "options": [
+                { "text": "A ponte — prefiro confiar nos meus próprios passos a ficar parado pensando.", "weights": { "G": 2.3, "S": 0.6, "H": 0.4, "R": 0.1 } },
+                { "text": "O enigma — não há motivo para arriscar a vida se a mente pode abrir o caminho.", "weights": { "R": 2.3, "S": 0.8, "H": 0.2, "G": 0.1 } },
+                { "text": "Examino ambas primeiro para descobrir qual delas leva ao destino mais seguro e vantajoso.", "weights": { "S": 2.1, "R": 1.0, "H": 0.3, "G": 0.1 } },
+                { "text": "Escolho aquela em que eu possa ajudar quem estiver comigo a atravessar melhor.", "weights": { "H": 2.3, "G": 0.8, "R": 0.2, "S": 0.1 } }
+            ]
+        },
+        {
+            "id": "q_injustice",
+            "category": "Injustiça Silenciosa",
+            "text": "Você descobre que alguém recebeu crédito por um trabalho brilhante que na verdade foi feito por um colega tímido. O que você faz?",
+            "options": [
+                { "text": "Exponho a verdade publicamente na primeira oportunidade, sem me importar com o clima.", "weights": { "G": 2.3, "H": 0.9, "R": 0.2, "S": 0.0 } },
+                { "text": "Apoio o colega e o ajudo a apresentar provas concretas de que o trabalho é dele.", "weights": { "H": 2.1, "R": 1.0, "G": 0.4, "S": 0.1 } },
+                { "text": "Uso a informação com cautela para virar a situação a favor do verdadeiro autor no momento certo.", "weights": { "S": 2.2, "R": 0.8, "H": 0.4, "G": 0.1 } },
+                { "text": "Documento os fatos com precisão para que a verdade se sustente por si mesma.", "weights": { "R": 2.2, "H": 0.8, "S": 0.4, "G": 0.1 } }
+            ]
+        },
+        {
+            "id": "q_solitude",
+            "category": "Horas Solitárias",
+            "text": "Você tem uma noite inteira livre, sem obrigações ou distrações. Como ela tende a passar?",
+            "options": [
+                { "text": "Mergulhado em um livro, projeto ou ideia que prende toda a minha curiosidade.", "weights": { "R": 2.4, "S": 0.5, "H": 0.4, "G": 0.1 } },
+                { "text": "Planejando meus próximos passos e organizando metas pessoais importantes.", "weights": { "S": 2.3, "R": 0.8, "G": 0.2, "H": 0.1 } },
+                { "text": "Conversando, cozinhando ou criando um ambiente acolhedor para pessoas queridas.", "weights": { "H": 2.4, "G": 0.6, "R": 0.2, "S": 0.2 } },
+                { "text": "Saindo para explorar algum lugar novo ou praticando algo que exija energia.", "weights": { "G": 2.3, "H": 0.6, "S": 0.3, "R": 0.2 } }
+            ]
+        },
+        {
+            "id": "q_box",
+            "category": "A Caixa Lacrada",
+            "text": "Você encontra uma caixa antiga com um bilhete: 'Pertence àquele que souber usá-la'. Qual é seu primeiro pensamento?",
+            "options": [
+                { "text": "Quero descobrir o mecanismo interno e o propósito original de quem a construiu.", "weights": { "R": 2.3, "S": 0.7, "H": 0.2, "G": 0.2 } },
+                { "text": "Abro para ver o que há dentro — oportunidades assim não aparecem duas vezes.", "weights": { "G": 2.1, "S": 1.0, "R": 0.3, "H": 0.0 } },
+                { "text": "Avalio se o conteúdo pode ser útil para meus objetivos antes de decidir o que fazer.", "weights": { "S": 2.3, "R": 0.7, "G": 0.3, "H": 0.1 } },
+                { "text": "Tento descobrir se alguém a perdeu e está procurando por ela.", "weights": { "H": 2.4, "G": 0.6, "R": 0.3, "S": 0.1 } }
+            ]
+        },
+        {
+            "id": "q_truth",
+            "category": "O Peso da Verdade",
+            "text": "O que mais irrita ou incomoda você no comportamento das outras pessoas?",
+            "options": [
+                { "text": "A covardia de quem foge quando precisa defender aquilo em que diz acreditar.", "weights": { "G": 2.4, "H": 0.7, "S": 0.2, "R": 0.1 } },
+                { "text": "A arrogância de quem se recusa a aprender ou ouvir argumentos racionais.", "weights": { "R": 2.4, "H": 0.6, "S": 0.3, "G": 0.1 } },
+                { "text": "A deslealdade de quem usa os outros e depois vira as costas.", "weights": { "H": 2.3, "G": 0.8, "S": 0.2, "R": 0.1 } },
+                { "text": "A falta de visão de quem desperdiça potencial por medo de arriscar.", "weights": { "S": 2.3, "G": 0.7, "R": 0.4, "H": 0.0 } }
+            ]
+        }
+    ],
+
+    "hatstallQuestion": {
+        "id": "q_hatstall",
+        "category": "Deliberação Final do Chapéu",
+        "text": "Vejo duas forças equilibradas em sua mente. Se você precisasse escolher apenas uma bússola para guiar toda a sua vida, qual seria?",
+        "options": [
+            { "text": "Agir com coragem e integridade mesmo quando tudo parece perdido.", "weights": { "G": 3.0, "H": 0.4, "R": 0.1, "S": 0.1 } },
+            { "text": "Buscar a verdade e a compreensão profunda acima de qualquer convenção.", "weights": { "R": 3.0, "S": 0.4, "H": 0.1, "G": 0.1 } },
+            { "text": "Permanecer fiel às pessoas e construir algo justo e duradouro.", "weights": { "H": 3.0, "G": 0.4, "R": 0.1, "S": 0.1 } },
+            { "text": "Moldar o próprio destino com inteligência, astúcia e determinação.", "weights": { "S": 3.0, "R": 0.4, "G": 0.1, "H": 0.1 } }
+        ]
+    }
+}
+

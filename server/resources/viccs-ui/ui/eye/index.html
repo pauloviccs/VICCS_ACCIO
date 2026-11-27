@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR" data-house-theme="gryffindor">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACCIO — Olho Mágico</title>
+    <link rel="stylesheet" href="fw://resources/viccs-ui/ui/tokens.css" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div id="eye-hud" class="eye-hud hidden" aria-live="polite" aria-atomic="true">
+        <div id="reticle" class="reticle is-idle" aria-hidden="true">
+            <span class="reticle-ring"></span>
+            <span class="reticle-pip"></span>
+        </div>
+
+        <div id="eye-callout" class="callout is-idle">
+            <p id="callout-idle-msg" class="callout-idle-msg">
+                <span class="keycap-mini">ALT</span> Olho Mágico · Mire em um alvo do mundo
+            </p>
+
+            <div id="callout-target" class="callout-target hidden">
+                <div class="callout-top">
+                    <span id="target-name" class="target-name">Alvo</span>
+                    <span id="target-state" class="state-pill available">Disponível</span>
+                </div>
+                <div class="callout-meta">
+                    <span id="target-keycap" class="keycap">F</span>
+                    <span id="target-action" class="target-action">Interagir</span>
+                    <span id="target-distance" class="target-distance"></span>
+                </div>
+                <p id="target-reason" class="target-reason hidden"></p>
+            </div>
+        </div>
+
+        <div id="eye-feedback" class="eye-feedback hidden"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

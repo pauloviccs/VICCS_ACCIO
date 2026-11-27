@@ -1,0 +1,23 @@
+{
+    "$description": "Override opcional do viccs-core. Copie para server/data/viccs-core.json para personalizar sem alterar o resource.",
+    "featureToggles": {
+        "debugMode": false,
+        "enforceEraGate": true,
+        "ecosystemWebhooks": true
+    },
+    "identity": {
+        "supabaseTicketValidation": false,
+        "supabaseUrl": "https://seu-projeto.supabase.co",
+        "supabaseServiceKey": "",
+        "timeoutMs": 6000
+    },
+    "canonEra": {
+        "eraId": "post-war-2000s",
+        "academicYear": 2000,
+        "headmaster": "Aurelian Vale Diggory",
+        "term": "autumn"
+    },
+    "tick": {
+        "intervalMs": 15000
+    }
+}

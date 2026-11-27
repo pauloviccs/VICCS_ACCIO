@@ -1,0 +1,13 @@
+{
+    "$description": "Override opcional do viccs-sorting. Copie para server/data/viccs-sorting.json para calibrar perguntas ou limiares sem alterar o codigo.",
+    "featureToggles": {
+        "announceVerdictToAll": true,
+        "autoStartOnOnboarding": true,
+        "enablePlayerCommands": false
+    },
+    "rules": {
+        "questionsPerSession": 8,
+        "hatstallThreshold": 1.6,
+        "deliberationMs": 2400
+    }
+}

@@ -1,0 +1,138 @@
+{
+    "$schema": "viccs-config",
+    "$resource": "viccs-characters",
+    "$version": "1.0.0",
+    "$description": "Perfis RP, catalogo canonico de varinhas e ponte opcional com fichas aprovadas no Supabase.",
+
+    "featureToggles": {
+        "enabled": true,
+        "debugMode": false,
+        "supabaseSync": false,
+        "requireWhitelistVerification": false,
+        "allowAssertedDiscordInDev": true,
+        "autoApplyHouseFromWhitelist": false,
+        "autoShowSheetAfterSorting": true,
+        "showControlsIntroAfterOnboarding": true,
+        "enablePlayerCommands": false
+    },
+
+    "houseRobes": {
+        "autoApplyOnSorting": true,
+        "restoreOnCharacterLoaded": true,
+        "applyUnaffiliatedOnJoin": true,
+        "outfitItemId": "Outfit_001_Basic",
+        "backItemId": "Back_001_Basic"
+    },
+
+    "defaults": {
+        "startingAcademicYear": 1,
+        "defaultBloodStatus": "half-blood",
+        "defaultBirthPlace": "Grã-Bretanha",
+        "defaultWand": {
+            "wood": "Carvalho Inglês",
+            "core": "Pena de Fênix",
+            "length": "11 polegadas",
+            "flexibility": "Firme",
+            "handleId": "imperial-brown-gold"
+        }
+    },
+
+    "supabase": {
+        "// nota": "Configure url e serviceRoleKey apenas em server/data/viccs-characters.json ou via env VICCS_SUPABASE_URL / VICCS_SUPABASE_SERVICE_KEY.",
+        "url": "",
+        "serviceRoleKey": "",
+        "timeoutMs": 6000
+    },
+
+    "wandHandles": [
+        {
+            "id": "arrow-black",
+            "name": "Arrow — Black",
+            "family": "Flecha",
+            "colorName": "Ébano & Latão",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/arrow-black.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Arrow_Black_wand-handle_sketch.webp"
+        },
+        {
+            "id": "avian-grey",
+            "name": "Avian — Grey",
+            "family": "Aviário",
+            "colorName": "Grafite & Bronze",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/avian-grey.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Avian_-_Grey_sketch.webp"
+        },
+        {
+            "id": "basketweave-black",
+            "name": "Basketweave — Black",
+            "family": "Cesto Trançado",
+            "colorName": "Couro Negro & Bronze",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/basketweave-black.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Basketweave_-_Black_field_guide_sketch.webp"
+        },
+        {
+            "id": "botanical-gold",
+            "name": "Botanical — Gold Leaf",
+            "family": "Botânico",
+            "colorName": "Folhas de Ouro",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/botanical-gold.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Botanical_-_Silver_Leaf_sketch.webp"
+        },
+        {
+            "id": "celestial-blue",
+            "name": "Celestial — Blue",
+            "family": "Celestial",
+            "colorName": "Azul Safira & Prata",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/celestial-blue.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Celestial_-_Blue_sketch.webp"
+        },
+        {
+            "id": "checkerboard-teal",
+            "name": "Checkerboard — Teal",
+            "family": "Xadrez / Mosaico",
+            "colorName": "Malaquita & Teca",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/checkerboard-teal.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Checkerboard_Teal_wand-handle_sketch.webp"
+        },
+        {
+            "id": "column-dark-brown",
+            "name": "Column — Dark Brown",
+            "family": "Coluna Clássica",
+            "colorName": "Nogueira Imperial",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/column-dark-brown.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Column_Dark_Brown_sketch.webp"
+        },
+        {
+            "id": "corkscrew-brown",
+            "name": "Corkscrew — Brown",
+            "family": "Espiral Torcida",
+            "colorName": "Carvalho Tostado",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/corkscrew-brown.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Corkscrew_Brown_sketch.webp"
+        },
+        {
+            "id": "imperial-brown-gold",
+            "name": "Imperial — Brown & Gold",
+            "family": "Imperial",
+            "colorName": "Mogno Real & Ouro 24k",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/imperial-brown-gold.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Imperial_-_Brown_and_Gold_Field_Guide_sketch.webp"
+        },
+        {
+            "id": "orbicular-gold",
+            "name": "Orbicular — Gold",
+            "family": "Orbicular",
+            "colorName": "Ouro Velho & Cerejeira",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/orbicular-gold.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Orbicular_-_Gold_Field_Guide_sketch.webp"
+        },
+        {
+            "id": "regal-blue",
+            "name": "Regal — Blue",
+            "family": "Régio",
+            "colorName": "Azul Ultramarino & Platina",
+            "cutoutUrl": "fw://resources/viccs-ui/ui/assets/wands/cutouts/regal-blue.png",
+            "sketchUrl": "fw://resources/viccs-ui/ui/assets/wands/sketches/Regal_-_Blue_sketch.webp"
+        }
+    ]
+}
+

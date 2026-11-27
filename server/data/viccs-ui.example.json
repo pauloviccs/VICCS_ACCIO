@@ -1,0 +1,21 @@
+{
+    "$description": "Override opcional do viccs-ui. Copie para server/data/viccs-ui.json para ajustar teclas do Olho Magico (Alt) ou Livro do Jogador (Esc).",
+    "featureToggles": {
+        "audioEnabled": true,
+        "magicEyeEnabled": true,
+        "playerBookEnabled": true,
+        "disableNativePauseMenu": true
+    },
+    "eye": {
+        "key": "alt",
+        "mode": "toggle",
+        "radiusCm": 1800,
+        "scanIntervalMs": 140,
+        "syncIntervalMs": 450,
+        "closeOnTrigger": true
+    },
+    "book": {
+        "key": "escape",
+        "settingsKey": "f10"
+    }
+}

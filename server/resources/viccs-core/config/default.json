@@ -1,0 +1,49 @@
+{
+    "$schema": "viccs-config",
+    "$resource": "viccs-core",
+    "$version": "1.0.0",
+    "$description": "Configuracoes centrais do ecossistema VICCS Accio (EraGate, tick global, auditoria e seguranca).",
+    "featureToggles": {
+        "enabled": true,
+        "debugMode": false,
+        "auditEnabled": true,
+        "tickEnabled": true,
+        "enforceEraGate": true,
+        "ecosystemWebhooks": true
+    },
+    "canonEra": {
+        "// nota": "Era padrao alinhada ao portal web (anos 2000, pos-Batalha de Hogwarts).",
+        "eraId": "post-war-2000s",
+        "academicYear": 2000,
+        "headmaster": "Aurelian Vale Diggory",
+        "term": "autumn"
+    },
+    "tick": {
+        "// intervalMs": "Intervalo em milissegundos do tick global viccs:core:serverTick (min 1000, max 300000).",
+        "intervalMs": 15000
+    },
+    "audit": {
+        "// maxReasonLength": "Tamanho maximo da justificativa registrada em viccs_audit.",
+        "maxReasonLength": 240,
+        "defaultQueryLimit": 20
+    },
+    "commands": {
+        "adminGroups": [
+            {
+                "key": "admin",
+                "minimumGrade": 1
+            },
+            {
+                "key": "super_admin",
+                "minimumGrade": 1
+            }
+        ]
+    },
+    "identity": {
+        "// nota": "Configure URL e Service Key em server/data/viccs-core.json para validar tickets/codigos do site sem spoofing.",
+        "supabaseTicketValidation": false,
+        "supabaseUrl": "",
+        "supabaseServiceKey": "",
+        "timeoutMs": 6000
+    }
+}

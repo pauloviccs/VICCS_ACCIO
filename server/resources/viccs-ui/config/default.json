@@ -1,0 +1,66 @@
+{
+  "$schema": "viccs-config",
+  "$resource": "viccs-ui",
+  "$version": "1.1.0",
+  "$description": "Configuracoes de UI diegetica, tema das casas, cortina de fade, Olho Magico (Alt), Livro do Jogador (Esc) e cues Wwise one-shot.",
+  "featureToggles": {
+    "enabled": true,
+    "debugMode": false,
+    "audioEnabled": true,
+    "magicEyeEnabled": true,
+    "playerBookEnabled": true,
+    "disableNativePauseMenu": true,
+    "fadeEnabled": true
+  },
+  "theme": {
+    "defaultHouse": "gryffindor"
+  },
+  "parchment": {
+    "animationMs": 320,
+    "defaultSignature": "Diretoria de Hogwarts — ACCIO Roleplay"
+  },
+  "fade": {
+    "defaultDurationMs": 550
+  },
+  "eye": {
+    "// key": "Tecla fisica exclusiva para a retícula de observação no mundo (padrão: alt).",
+    "key": "alt",
+    "// mode": "'toggle' (aperta Alt para ligar/desligar) ou 'hold' (segurar Alt).",
+    "mode": "toggle",
+    "// radiusCm": "Raio em centimetros ao redor do jogador para observar alvos válidos (1800 = 18m).",
+    "radiusCm": 1800,
+    "scanIntervalMs": 140,
+    "syncIntervalMs": 450,
+    "closeOnTrigger": true
+  },
+  "book": {
+    "key": "escape",
+    "settingsKey": "f10",
+    "pages": {
+      "character": "Personagem & Casa",
+      "wand": "Varinha",
+      "classes": "Aulas & Evolução",
+      "spells": "Magias",
+      "grimoire": "Grimório & Recursos",
+      "system": "Sistema & Controles"
+    }
+  },
+  "audio": {
+    "// maxCueDurationSeconds": "Duracao maxima de qualquer efeito sonoro de UI em segundos para impedir loops infinitos.",
+    "maxCueDurationSeconds": 3
+  },
+  "audioCues": {
+    "// nota": "Apenas eventos one-shot seguros do Wwise (nunca sons continuos sem stop).",
+    "uiOpen": "open",
+    "uiClose": "close",
+    "uiClick": "click",
+    "uiConfirm": "click",
+    "parchmentOpen": "owl",
+    "sortingComplete": "stinger",
+    "eyeOpen": "open",
+    "eyeClose": "close",
+    "bookOpen": "open",
+    "bookClose": "close",
+    "denied": "close"
+  }
+}

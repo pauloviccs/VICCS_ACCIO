@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR" data-house-theme="gryffindor">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACCIO — Bilhete de Embarque</title>
+    <link rel="stylesheet" href="fw://resources/viccs-ui/ui/tokens.css" />
+    <style>
+        .overlay { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; background: rgba(5, 8, 15, 0.82); }
+        .overlay.hidden { display: none; }
+        .link-shell { width: min(520px, 92vw); padding: 30px 34px; display: flex; flex-direction: column; gap: 14px; animation: magicPanelIn 0.34s var(--ease-sheet) forwards; }
+        .link-title { font-size: 24px; }
+        .link-desc { font-family: var(--font-crimson); font-size: 17px; line-height: 1.55; color: var(--color-muted); }
+        .link-input { width: 100%; min-height: 44px; padding: 12px 14px; background: #070b13; border: 1px solid var(--hair); color: var(--color-ink); font-family: var(--font-mono); font-size: 16px; letter-spacing: 0.14em; text-transform: uppercase; text-align: center; }
+        .link-input:focus-visible { border-color: var(--house-border-strong); outline: 2px solid var(--house-accent-secondary); outline-offset: 2px; }
+        .link-error { font-size: 13px; color: #f08e84; min-height: 18px; }
+        .link-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+        .link-actions button { min-height: 44px; flex: 1; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="link-title">
+        <section id="link-panel" class="frame link-shell">
+            <div>
+                <p class="eyebrow">Vínculo Ministerial Seguro</p>
+                <h1 id="link-title" class="title link-title">Bilhete do Expresso</h1>
+            </div>
+            <p class="link-desc">
+                Informe o <strong>Código de Embarque</strong> exibido no seu Passe Oficial no site para vincular seu personagem aprovado ao seu cadastro sem permitir fraudes.
+            </p>
+            <input id="link-code" class="link-input" type="text" maxlength="24" placeholder="ACCIO-XXXXXX" autocomplete="off" />
+            <p id="link-error" class="link-error" aria-live="polite"></p>
+            <div class="link-actions">
+                <button type="button" id="btn-skip" class="btn-secondary hidden">Continuar Depois</button>
+                <button type="button" id="btn-submit" class="btn-primary">Validar Bilhete &amp; Embarcar</button>
+            </div>
+        </section>
+    </div>
+    <script src="fw://resources/viccs-ui/ui/ornaments.js"></script>
+    <script>
+        'use strict';
+        const overlay = document.getElementById('overlay');
+        const panel = document.getElementById('link-panel');
+        const input = document.getElementById('link-code');
+        const errEl = document.getElementById('link-error');
+        const btnSubmit = document.getElementById('btn-submit');
+        const btnSkip = document.getElementById('btn-skip');
+        let canDismiss = true;
+        let isOpen = false;
+        let pending = false;
+
+        window.ViccsOrnaments.injectFrameCorners(panel);
+
+        function send(ev, data = {}) {
+            try { if (typeof callEvent === 'function') callEvent(ev, JSON.stringify(data)); } catch (_) {}
+        }
+
+        function setLoading(loading) {
+            pending = Boolean(loading);
+            btnSubmit.disabled = pending;
+            btnSubmit.textContent = pending ? 'Validando...' : 'Validar Bilhete & Embarcar';
+        }
+
+        function submitCode() {
+            if (pending) return;
+            const code = input.value.trim();
+            if (!code) {
+                errEl.textContent = 'Digite seu código de embarque.';
+                input.focus();
+                return;
+            }
+            errEl.textContent = '';
+            setLoading(true);
+            send('submit', { code });
+        }
+
+        function dismiss() {
+            if (!canDismiss || !isOpen) return;
+            isOpen = false;
+            setLoading(false);
+            overlay.classList.add('hidden');
+            send('close', { reason: 'dismissed' });
+        }
+
+        btnSubmit.addEventListener('click', submitCode);
+        btnSkip.addEventListener('click', dismiss);
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') submitCode();
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen && canDismiss) {
+                e.preventDefault();
+                dismiss();
+            }
+        });
+
+        window.addEventListener('viccs:characters:link:open', (e) => {
+            const detail = e.detail || {};
+            canDismiss = detail.canDismiss !== false;
+            isOpen = true;
+            setLoading(false);
+            btnSkip.classList.toggle('hidden', !canDismiss);
+            errEl.textContent = detail.error || '';
+            overlay.classList.remove('hidden');
+            setTimeout(() => input.focus(), 0);
+        });
+        window.addEventListener('viccs:characters:link:error', (e) => {
+            setLoading(false);
+            errEl.textContent = e.detail?.message || 'Código inválido. Confira no site ou tente novamente.';
+        });
+        window.addEventListener('viccs:characters:link:close', () => {
+            isOpen = false;
+            setLoading(false);
+            overlay.classList.add('hidden');
+        });
+        send('ready');
+    </script>
+</body>
+</html>
+

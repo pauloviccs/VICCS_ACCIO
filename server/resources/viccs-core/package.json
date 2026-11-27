@@ -1,0 +1,43 @@
+{
+  "name": "viccs-core",
+  "version": "1.0.0",
+  "author": "VICCS Team",
+  "description": "Espinha dorsal do ecossistema VICCS Accio: registro universal de saude, EraGate, configs em camadas, auditoria e barramento de ciclo de vida.",
+  "license": "MIT",
+  "mafiahub": {
+    "serverScripts": [
+      "server/main.js"
+    ],
+    "exports": [
+      "status",
+      "registry",
+      "era",
+      "audit",
+      "config",
+      "safeImport",
+      "auth",
+      "ecosystem",
+      "bridge"
+    ],
+    "resourceDependencies": [
+      {
+        "name": "hmp-mysql",
+        "version": "0.12.0"
+      },
+      {
+        "name": "hmp-lib",
+        "version": "0.12.0"
+      },
+      {
+        "name": "hmp-core",
+        "version": "0.12.0"
+      },
+      {
+        "name": "hmp-houses",
+        "version": "0.12.0"
+      }
+    ],
+    "errorBehavior": "stop",
+    "priority": 20
+  }
+}

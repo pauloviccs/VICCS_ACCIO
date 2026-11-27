@@ -1,0 +1,401 @@
+/* ═══════════════════════════════════════════════════════════════
+   VICCS Accio — Design System Shared Tokens (CEF)
+   Espelho fiel de website/src/index.css + fontes locais offline-safe
+   ═══════════════════════════════════════════════════════════════ */
+
+@font-face {
+    font-family: "Cinzel";
+    src: url("fw://resources/viccs-ui/ui/fonts/Cinzel-Variable.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Spectral";
+    src: url("fw://resources/viccs-ui/ui/fonts/Spectral-Regular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+}
+
+:root {
+    --font-display: "Marcellus", "Cinzel", Georgia, serif;
+    --font-sans: "Source Sans 3", "Spectral", system-ui, sans-serif;
+    --font-crimson: "Crimson Pro", "Spectral", Georgia, serif;
+    --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+
+    --color-base: #090e17;
+    --color-surface: #0a0f19;
+    --color-surface-elevated: #0d1422;
+    --color-ink: #ece7da;
+    --color-muted: #b6bbc5;
+    --color-subtle: #8b93a1;
+    --color-gold: #c9b07a;
+    --color-gold-bright: #ead6a6;
+    --color-gold-deep: #9c7f4a;
+
+    --hair: rgba(201, 176, 122, 0.32);
+    --hair-soft: rgba(201, 176, 122, 0.14);
+    --bevel: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+    --ease-arcane: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-sheet: cubic-bezier(0.16, 1, 0.3, 1);
+
+    --house-primary: #b5675e;
+    --house-secondary: #5b1009;
+    --house-accent: #ead6a6;
+    --house-accent-secondary: #ffc34f;
+    --house-accent-bright: #ece7da;
+    --house-glow: rgba(201, 176, 122, 0.34);
+    --house-bg-deep: #090e17;
+    --house-bg-radial: #1c1318;
+    --house-card-bg: rgba(10, 15, 25, 0.94);
+    --house-modal-bg: rgba(9, 14, 23, 0.97);
+    --house-border: rgba(201, 176, 122, 0.34);
+    --house-border-strong: rgba(234, 214, 166, 0.6);
+    --house-grad-start: #f6ead0;
+    --house-grad-mid: #dcc28d;
+    --house-grad-end: #b39257;
+    --house-btn-start: #efdcab;
+    --house-btn-mid: #cdae6a;
+    --house-btn-end: #a8874c;
+    --house-btn-text: #17130b;
+}
+
+[data-house-theme="gryffindor"] {
+    --house-primary: #b5675e;
+    --house-secondary: #5b1009;
+    --house-accent: #ead6a6;
+    --house-accent-secondary: #ffc34f;
+    --house-accent-bright: #ece7da;
+    --house-glow: rgba(201, 176, 122, 0.34);
+    --house-bg-deep: #090e17;
+    --house-bg-radial: #1c1318;
+    --house-card-bg: rgba(10, 15, 25, 0.94);
+    --house-modal-bg: rgba(9, 14, 23, 0.97);
+    --house-border: rgba(201, 176, 122, 0.34);
+    --house-border-strong: rgba(234, 214, 166, 0.6);
+    --house-grad-start: #f6ead0;
+    --house-grad-mid: #dcc28d;
+    --house-grad-end: #b39257;
+    --house-btn-start: #efdcab;
+    --house-btn-mid: #cdae6a;
+    --house-btn-end: #a8874c;
+    --house-btn-text: #17130b;
+}
+
+[data-house-theme="slytherin"] {
+    --house-primary: #6e9e81;
+    --house-secondary: #123524;
+    --house-accent: #9fd3b4;
+    --house-accent-secondary: #6e9e81;
+    --house-accent-bright: #e6f2ec;
+    --house-glow: rgba(110, 158, 129, 0.34);
+    --house-bg-deep: #080f14;
+    --house-bg-radial: #0e1e1c;
+    --house-card-bg: rgba(9, 17, 20, 0.94);
+    --house-modal-bg: rgba(8, 15, 18, 0.97);
+    --house-border: rgba(110, 158, 129, 0.36);
+    --house-border-strong: rgba(159, 211, 180, 0.6);
+    --house-grad-start: #e6f2ec;
+    --house-grad-mid: #9fd3b4;
+    --house-grad-end: #6e9e81;
+    --house-btn-start: #d7efe0;
+    --house-btn-mid: #8ec1a2;
+    --house-btn-end: #5d8d70;
+    --house-btn-text: #091510;
+}
+
+[data-house-theme="ravenclaw"] {
+    --house-primary: #7e98bd;
+    --house-secondary: #112442;
+    --house-accent: #b6cbe8;
+    --house-accent-secondary: #c9b07a;
+    --house-accent-bright: #e8eef7;
+    --house-glow: rgba(126, 152, 189, 0.35);
+    --house-bg-deep: #070d18;
+    --house-bg-radial: #101c33;
+    --house-card-bg: rgba(10, 16, 29, 0.94);
+    --house-modal-bg: rgba(7, 13, 24, 0.97);
+    --house-border: rgba(126, 152, 189, 0.36);
+    --house-border-strong: rgba(182, 203, 232, 0.6);
+    --house-grad-start: #edf3fc;
+    --house-grad-mid: #b6cbe8;
+    --house-grad-end: #7e98bd;
+    --house-btn-start: #dde8f8;
+    --house-btn-mid: #9db6da;
+    --house-btn-end: #6c86ac;
+    --house-btn-text: #07101f;
+}
+
+[data-house-theme="hufflepuff"] {
+    --house-primary: #c7ac63;
+    --house-secondary: #2e2410;
+    --house-accent: #ead6a6;
+    --house-accent-secondary: #c7ac63;
+    --house-accent-bright: #f7eed6;
+    --house-glow: rgba(199, 172, 99, 0.36);
+    --house-bg-deep: #0c0d12;
+    --house-bg-radial: #1f1b12;
+    --house-card-bg: rgba(16, 16, 20, 0.94);
+    --house-modal-bg: rgba(12, 12, 16, 0.97);
+    --house-border: rgba(199, 172, 99, 0.36);
+    --house-border-strong: rgba(234, 214, 166, 0.62);
+    --house-grad-start: #f9efd4;
+    --house-grad-mid: #e2c57e;
+    --house-grad-end: #b29246;
+    --house-btn-start: #f4e4b8;
+    --house-btn-mid: #d6b86f;
+    --house-btn-end: #a88a42;
+    --house-btn-text: #171206;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    user-select: none;
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-gold-bright);
+    outline-offset: 3px;
+}
+
+.eyebrow {
+    font-family: var(--font-display);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--house-accent-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.title {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+    color: var(--house-accent);
+    -webkit-text-fill-color: transparent;
+    background-image:
+        linear-gradient(105deg, transparent 44%, rgba(255, 250, 236, 0.95) 50%, transparent 56%),
+        linear-gradient(var(--house-grad-start) 10%, var(--house-grad-mid) 55%, var(--house-grad-end) 95%);
+    background-size: 300% 100%, 100% 100%;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    font-weight: 400;
+    line-height: 1.15;
+    animation: titleGlint 2.4s var(--ease-arcane) 0.2s 1 both;
+}
+
+.frame {
+    isolation: isolate;
+    position: relative;
+    border: 1px solid var(--house-border);
+    background: var(--house-card-bg);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow: 0 28px 72px rgba(0, 0, 0, 0.68);
+    transition: border-color 0.5s ease, background-color 0.5s ease;
+}
+
+.frame::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1px solid var(--hair-soft);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.frame-corner {
+    position: absolute;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    color: var(--house-accent-secondary);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25px;
+    pointer-events: none;
+    transition: color 0.5s ease;
+}
+
+.frame-corner-tl { top: -1px; left: -1px; }
+.frame-corner-tr { top: -1px; right: -1px; scale: -1 1; }
+.frame-corner-bl { bottom: -1px; left: -1px; scale: 1 -1; }
+.frame-corner-br { bottom: -1px; right: -1px; scale: -1; }
+
+.divider {
+    width: 220px;
+    height: 14px;
+    color: var(--house-accent-secondary);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1px;
+    display: block;
+}
+
+.btn-primary,
+.btn-secondary {
+    isolation: isolate;
+    position: relative;
+    min-height: 44px;
+    padding: 0 24px;
+    border: none;
+    clip-path: var(--bevel);
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.btn-primary {
+    color: var(--house-btn-text);
+    background: linear-gradient(var(--house-btn-start), var(--house-btn-mid) 55%, var(--house-btn-end));
+}
+
+.btn-primary:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 0 18px var(--house-glow);
+}
+
+.btn-primary:active,
+.btn-secondary:active {
+    transform: scale(0.985);
+}
+
+.btn-secondary {
+    color: var(--house-accent);
+    background: rgba(201, 176, 122, 0.6);
+}
+
+.btn-secondary::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: var(--bevel);
+    background: #0b111c;
+    transition: background-color 0.2s;
+}
+
+.btn-secondary:hover::before {
+    background: #172033;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #7fd29a;
+    display: inline-block;
+    box-shadow: 0 0 0 3px rgba(127, 210, 154, 0.16);
+    animation: livePulse 2.2s infinite;
+}
+
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: var(--color-base); }
+::-webkit-scrollbar-thumb { background: #172033; border: 1px solid var(--hair); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #23304d; }
+::-webkit-scrollbar-corner { background: transparent; }
+
+@keyframes titleGlint {
+    0% { background-position: 0 0, 0 0; }
+    100% { background-position: 100% 0, 0 0; }
+}
+
+@keyframes magicPanelIn {
+    0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes magicPanelOut {
+    0% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.96) translateY(8px); }
+}
+
+@keyframes livePulse {
+    0% { box-shadow: 0 0 0 0 rgba(127, 210, 154, 0.5); }
+    70%, 100% { box-shadow: 0 0 0 8px rgba(127, 210, 154, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* ── Shared Form, Modal & Badge Primitives for HMP + VICCS Views ── */
+
+.viccs-field {
+    width: 100%;
+    padding: 10px 12px;
+    color: var(--color-ink);
+    background: rgba(9, 14, 23, 0.92);
+    border: 1px solid var(--hair);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s var(--ease-arcane), box-shadow 0.2s var(--ease-arcane);
+}
+
+.viccs-field:focus {
+    border-color: var(--house-accent-secondary);
+    box-shadow: 0 0 0 2px var(--hair-soft);
+}
+
+.viccs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid var(--hair);
+    background: var(--color-surface-elevated);
+    color: var(--house-accent);
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.viccs-icon-btn {
+    width: 34px;
+    height: 34px;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid var(--hair);
+    background: var(--color-surface-elevated);
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+
+.viccs-icon-btn:hover,
+.viccs-icon-btn:focus-visible {
+    border-color: var(--house-border-strong);
+    color: var(--house-accent-bright);
+    background: #172033;
+}

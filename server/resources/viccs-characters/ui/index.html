@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR" data-house-theme="gryffindor">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACCIO — Ficha & Varinha</title>
+    <link rel="stylesheet" href="fw://resources/viccs-ui/ui/tokens.css" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="char-name">
+        <section id="sheet-panel" class="frame sheet-shell">
+            <header class="sheet-header">
+                <div class="identity-row">
+                    <img id="house-emblem" class="emblem hidden" alt="" />
+                    <div>
+                        <p class="eyebrow"><span class="live-dot"></span> Registro Ministerial de Hogwarts</p>
+                        <h1 id="char-name" class="title char-name">Carregando...</h1>
+                        <p id="char-subtitle" class="char-subtitle"></p>
+                    </div>
+                </div>
+                <button type="button" id="btn-x" class="btn-secondary btn-close" aria-label="Fechar ficha">Fechar</button>
+            </header>
+
+            <div id="divider-slot"></div>
+
+            <nav class="tab-bar" role="tablist">
+                <button type="button" class="tab-btn active" data-tab="sheet" role="tab">Ficha Acadêmica</button>
+                <button type="button" class="tab-btn" data-tab="wand" role="tab">Oficina Ollivanders</button>
+            </nav>
+
+            <div id="tab-sheet" class="tab-panel">
+                <div class="stats-grid">
+                    <div class="stat-box"><span>Casa</span><strong id="val-house">-</strong></div>
+                    <div class="stat-box"><span>Ano Letivo</span><strong id="val-year">-</strong></div>
+                    <div class="stat-box"><span>Linhagem</span><strong id="val-blood">-</strong></div>
+                    <div class="stat-box"><span>Origem</span><strong id="val-birth">-</strong></div>
+                    <div class="stat-box"><span>Patrono</span><strong id="val-patronus">-</strong></div>
+                    <div class="stat-box"><span>Registro</span><strong id="val-id" class="mono">-</strong></div>
+                </div>
+                <div class="backstory-box">
+                    <span>Crônica &amp; História do Bruxo</span>
+                    <p id="val-backstory">-</p>
+                </div>
+            </div>
+
+            <div id="tab-wand" class="tab-panel hidden">
+                <div class="wand-layout">
+                    <div class="wand-stage">
+                        <div class="wand-mode-bar">
+                            <button type="button" class="mode-pill active" data-mode="macro">3D Macro</button>
+                            <button type="button" class="mode-pill" data-mode="sketch">Guia de Campo</button>
+                        </div>
+                        <img id="wand-visual" class="wand-visual" alt="Cabo da varinha" />
+                        <p id="wand-handle-title" class="wand-handle-title"></p>
+                    </div>
+                    <div class="wand-specs">
+                        <div class="spec-row"><span>Madeira</span><strong id="wand-wood">-</strong></div>
+                        <div class="spec-row"><span>Núcleo</span><strong id="wand-core">-</strong></div>
+                        <div class="spec-row"><span>Comprimento</span><strong id="wand-length">-</strong></div>
+                        <div class="spec-row"><span>Flexibilidade</span><strong id="wand-flex">-</strong></div>
+                        <div class="spec-row"><span>Empunhadura</span><strong id="wand-family">-</strong></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="fw://resources/viccs-ui/ui/ornaments.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+

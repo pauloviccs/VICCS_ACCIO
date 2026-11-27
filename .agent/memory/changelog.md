@@ -1,5 +1,90 @@
 # Changelog — VICCS Accio HL Server
 
+## [0.3.3] — 2026-11-27
+
+### Correções de Runtime ao Vivo (Fase 2): `Alt`, `Esc`, Salão Principal e Vestes Iniciais
+- **`viccs-ui` (`client/main.js`, `ui/book/app.js`, `ui/ornaments.js`, `server/main.js`):**
+  - Corrigido o handler de atalho do Olho Mágico (`Alt`) para ler `(physicalKey, state)` emitidos por `hmp-lib` (em vez de `event.state`), registrando `alt`, `lalt` e `ralt` com janela anti-duplicação (`80ms`).
+  - Corrigido `Uncaught TypeError` em `ui/book/app.js` substituindo `ViccsOrnaments.attachCorners(panel)` por `ViccsOrnaments.injectFrameCorners(panel)` (com alias em `ornaments.js`), pré-aquecimento das views no `worldReady` e watchdog anti-travamento em `openBookOverlay`.
+  - Substituído `PlayerManager.byId` por `resolveOnlinePlayer` usando `PlayerManager.getById`.
+- **`viccs-characters` (`config/default.json`, `server/service.js`, `server/handlers.js`):**
+  - Habilitado uniforme escolar neutro automático (`applyUnaffiliatedOnJoin: true`) com `Outfit_001_Basic` e `Back_001_Basic` antes da Seleção (`Unaffiliated`), atualizando automaticamente para as cores da Casa após o veredito sem sobrescrever roupas personalizadas já equipadas.
+  - Separado `op: 'give'` (`player.inventory.patch`) de `op: 'equip'` (`player.gear.equip` com `variation`), evitando `Unknown inventory patch operation` no host nativo, e corrigido `PlayerManager.byId` → `PlayerManager.getById`.
+- **`viccs-sorting` (`config/default.json`, `server/handlers.js`) & `viccs-core` (`server/service.js`):**
+  - Adicionada configuração `ceremonyLocation` (`fastTravelId: "FT_HW_GreatHall"`, suporte opcional a `coordinates`, `timeoutMs: 12000`, `settleMs: 450`, `alreadyThereRadiusCm: 3000`).
+  - Corrigido `PlayerManager.byId` → `PlayerManager.getById` no evento `viccs:characters:onboardingReady` e implementado transporte automático ao Salão Principal (`player.setFastTravelUnlocked` + `player.fastTravel('FT_HW_GreatHall')` + `playerFastTravelComplete`) com cortina de fade antes de abrir o Chapéu Seletor.
+  - Atualizado `summarizeRobesInventory` para exibir o status do uniforme neutro equipado no Livro do Jogador.
+- **Verificação:** `node --check` em todos os `.js`, validação JSON e `31/31` testes em `node --test` aprovados (incluindo testes VM/DOM de `book/app.js`, atalhos `lalt`/`alt`/`escape`, uniforme `unaffiliated` + `gear.equip` e fluxo `onboardingReady` → `FT_HW_GreatHall` → Sorting Hat).
+
+---
+
+## [0.3.2] — 2026-11-27
+
+### Regras de Imersão, Controles (`Alt` vs `Esc`), Vestes & Recuperação
+- **Governança (Fases 2–6):** Regras de `server/.agent/scripting/regras-de-implementacao-experiencia-imersiva-accio.md` integradas em `.agent/global-rules/rules.md`, `.agent/guidelines/ui_ux.md`, `.agent/guidelines/resource_conventions.md`, `.agent/skills/create-ui-panel.md`, `phase-2-core-resources-plan.md` e `master-plan.md`.
+- **`viccs-core`:** Implementado `getPlayerBookSnapshot`, `summarizeRobesInventory`, enriquecimento real de `inventory` em `getPlayerContext`, e `openService` para `'book'` e `'reapply-robes'`.
+- **`viccs-ui`:**
+  - Refatorado `Alt` (**Olho Mágico**) em `ui/eye/*` + `client/main.js` + `server/main.js` como retícula central pura de mundo (não bloqueia câmera/controles, não abre menu geral de sistemas, revalida `available`/`unavailable`/`blocked` no servidor, extensível por `eye.registerTargetProvider`).
+  - Criado `Esc` (**Livro do Jogador**) em `ui/book/*` substituindo o Field Guide nativo via `Game.setPauseMenuEnabled(false)`, preservando acesso seguro às configurações do jogo (`F10`), atualizando por eventos reais e extensível por `book.registerPageProvider`.
+- **`viccs-characters` & `viccs-sorting`:** Corrigido `pushCreatorPrefill` (`first_name`/`last_name`), adicionada migração v3 (`robes_house`, `robes_applied`) e `planHouseRobePatch` não-destrutivo (`Outfit_001_Basic` / `Back_001_Basic` + botão **"Reaplicar Vestes da Casa"** no Livro), pausa/retomada sem reroll no Chapéu Seletor e saída segura no vínculo.
+- **Verificação:** `27/27` testes unitários (`viccs-core`: 9, `viccs-ui`: 8, `viccs-characters`: 5, `viccs-sorting`: 5), `node --check` em todos os `.js` dos 4 resources e validação de `13` arquivos JSON.
+
+---
+
+## [0.3.1] — 2026-11-27
+
+### Ponte Anti-Spoofing Site ↔ Jogo, Áudio One-Shot & Fluxo Seamless da Fase 2
+- **Ponte Segura Direct Connect & Sincronia Bidirecional (`scripts/migration_accio_rp.sql`, `website/`, `viccs-core`, `viccs-characters`):**
+  - Adicionadas colunas `sorted_house`, `secondary_house`, `is_hatstall`, `sorted_at` e `game_character_id` em `public.character_applications` (e tipagem em `website/src/types.ts`) para registrar o veredito oficial do Chapéu Seletor de volta no portal web.
+  - Criadas as tabelas server-only `public.server_join_tickets` e `public.server_link_codes` (RLS sem políticas `anon`/`authenticated`) e a RPC `public.issue_server_link_code()` emitindo códigos únicos `ACCIO-*` (validade de 10 minutos).
+  - Atualizado `website/src/components/TicketModal.tsx` e `website/src/lib/supabase.ts` (`issueServerLinkCode`) com emissão e cópia do Código de Embarque In-Game.
+  - Implementado resgate seguro em `viccs-core/server/ticketBridge.js`, modal CEF `viccs-characters/ui/link/index.html`, proteção anti-duplicidade `idx_viccs_profiles_app_unique` + colunas `full_name`, `character_backstory`, `intro_completed` (`viccs-characters/server/database.js` v2) e bloqueio de reaproveitamento de ficha entre personagens (`isApplicationClaimedElsewhere`).
+- **Correção Anti-Loop de Áudio (`viccs-ui`):**
+  - Adicionado `resolveAudioCue()` com `SUSTAIN_LOOP_BLACKLIST` (`accio`, `accio_cast` → `stinger`), limite de duração (`maxCueDurationSeconds: 3`) e encerramento do handle prévio (`stopPlayerAudio`) antes de novos cues Wwise.
+- **Cascata Automática Pós-Spawn (`viccs-characters` + `viccs-sorting` + `viccs-ui`):**
+  - Encadeamento automático sem comandos: `hmp:spawn:complete` → `viccs:characters:onboardingReady` → `Fade` → `viccs-sorting` → `viccs:sorting:closed` → `Fade` → Ficha Ministerial (`wand` tab) → aviso de boas-vindas com o Olho Mágico (`[ALT]`).
+- **Verificação:** `19/19` testes unitários passando em `node --test server/resources/viccs-*/test/service.test.js` e `npx tsc --noEmit` aprovado sem erros em `website/`.
+
+---
+
+## [0.3.0] — 2026-11-26
+
+### Fase 2 — Core Resources VICCS, Ponte Universal, Visual ArcaneMP & Localização PT-BR
+- **4 Resources Autorais VICCS Implementados (`server/resources/viccs-*` + `server/data/viccs-*.example.json`):**
+  - **`viccs-core`:** Config em camadas (`config/default.json` + override em `data/`), `EraGate`, `Registry`, `safeImport`, auditoria (`viccs_audit` + `viccs_era_state`), `ticketBridge`, event bus (`server/events.js`) e **Ponte Universal do Ecossistema** (`server/ecosystemBridge.js`).
+  - **`viccs-ui`:** Sistema visual compartilhado em CEF (`ui/tokens.css`, `ui/ornaments.js`, emblemas das 4 Casas, 11 cutouts e 11 sketches de varinhas, fontes locais `Cinzel` e `Spectral`), componentes Pergaminho (`ui/parchment/`), Fade (`ui/fade/`), Olho Mágico via tecla `Alt` (`ui/eye/`) e broadcast reativo `viccs:theme:changed`.
+  - **`viccs-characters`:** Gestão de perfis (`viccs_character_profiles`), varinhas (`viccs_character_wands`), bridge com Supabase (`server/supabaseBridge.js`), tela de vínculo (`ui/link/index.html`) e envio de pré-preenchimento para o criador nativo (`hmp-creator:prefill`).
+  - **`viccs-sorting`:** Motor *Fail-Proof* do Chapéu Seletor (`viccs_sorting_sessions`, 12 dilemas, Fisher-Yates, limiar de Hatstall `< 1.6`, trava contra troca de personagem durante a cerimônia via `hmp:character:may-switch` e atribuição em `hmp-houses`).
+- **Ponte Universal do Ecossistema (`viccs-core/server/ecosystemBridge.js`):**
+  - Integração modular e lazy (`getApi`) entre todos os **30 módulos `hmp-*`** e **4 módulos `viccs-*`** sem warnings de dependência ausente, com `getPlayerContext(player)`, `openService(player, target)`, espelhamento `hmp:*` → `viccs:ecosystem:*` e encaminhamento opcional para `hmp-webhooks`.
+  - Expansão do Olho Mágico (`viccs-ui/server/service.js` e `main.js`) para oferecer atalhos contextuais sem comandos (`banking`, `jobs`, `business`, `beasts`, `link`, `duel-accept`).
+- **Unificação Visual das 7 WebViews HMP & Correção do Criador:**
+  - Aplicados tokens `viccs-ui/ui/tokens.css`, cantos SVG `ViccsOrnaments.injectFrameCorners`, botões chanfrados `--bevel` e escuta de `viccs:theme` em `hmp-ui/dist/index.html`, `hmp-spawn/dist/index.html`, `hmp-characters/dist/index.html`, `hmp-characters/dist/creator.html` + `creator.js`, `hmp-inventory/dist/index.html`, `hmp-emotes/dist/menu.html` (removida dependência externa Google Fonts) e `hmp-business/dist/index.html`.
+  - Corrigido erro de sintaxe residual em `hmp-characters/dist/creator.js` próximo ao handler de `hmp-creator:snapshot`.
+- **Tradução Completa para Português Brasileiro (PT-BR):**
+  - Localizados UIs, notificações, menus contextuais, alertas, interações `[F]` e respostas de chat nos módulos `hmp-characters`, `hmp-spawn`, `hmp-interact`, `hmp-doors`, `hmp-audio`, `hmp-blips`, `hmp-worldstate`, `hmp-lib`, `hmp-inventory`, `hmp-banking`, `hmp-shops`, `hmp-beasts`, `hmp-duels`, `hmp-houses`, `hmp-jobs`, `hmp-emotes`, `hmp-activities`, `hmp-pvp`, `hmp-spells`, `hmp-progression`, `hmp-loot`, `hmp-npcs`, `hmp-business`, `hmp-admin` e `hmp-webhooks`.
+  - Localizados catálogos e mensagens visíveis em `server/data/` (`hmp-core.json`, `hmp-inventory.json`, `hmp-shops.json`, `hmp-business.json`, `hmp-spells.json`, mantendo `hmp-characters.json` e `hmp-spawn.json` em PT-BR).
+- **Verificação:** `31/31` JSONs válidos, `89/89` arquivos JS aprovados no `node --check`, `19/19` testes unitários passando em `node --test` e boot real de `ArcaneMPServer.exe` com `34/34` resources JS iniciados e zero erros.
+
+---
+
+## [0.2.1] — 2026-11-26
+
+### Arquitetura ArcaneMP, Ecossistema & Novas Skills (`.agent/`)
+- **Mapeamento Real do Runtime ArcaneMP `1.15.1` + HMP Foundations `v0.12.0`:**
+  - Criado `.agent/context/arcanemp-scripting-foundations.md` documentando todos os 30 resources `hmp-*`, suas prioridades (`-1000` a `-250`), exports reais e primitivas (`Imports.get`, `Exports.register`, `MySQL.migrate`, `Events.onClient`, `Events.emitServer`, `Hmp.config`, `Hmp.input`, `Hmp.rateLimit`, `Spells.define`).
+  - Atualizados `.agent/global-rules/rules.md`, `.agent/guidelines/resource_conventions.md`, `.agent/skills/create-resource.md` e `.agent/skills/inter-resource-communication.md` com contrato universal do ecossistema, `status()` obrigatório, `safeImport` com degradação graciosa e configs com override em `server/data/viccs-*.json`.
+- **Novas Skills Extraídas do GDD (`hogwarts-rp-gdd.md`) & Spec do Chapéu Seletor (`especifica_o_t_cnica_sistema_chap_u_seletor.md`):**
+  - `.agent/skills/sorting-hat-system.md` — Motor *Fail-Proof* do Chapéu Seletor (`HouseKey`, pesos anti-gaming, Fisher-Yates, detecção de Hatstall `< 1.6`, persistência anti-reroll e cascata `viccs:sorting:completed`).
+  - `.agent/skills/diegetic-immersion-and-adapter.md` — Separação `service.js` puro vs adapter, imersão diegética sem UI de videogame e escada de fidelidade L0 → L1 → L2.
+  - `.agent/skills/canon-era-and-calendar.md` — Política de cânone Tiers A–F, `EraGate` configurável (reconciliado com era anos 2000 do servidor) e relógio escolar `viccs-clock`.
+  - `.agent/skills/pottermore-gameplay-loops.md` — Loops em 3 escalas, sinergias obrigatórias, `viccs-housecup`, `viccs-moments`, `viccs-discipline`, `viccs-collectibles`, `viccs-prophet`, `viccs-director` e DoD unificado.
+  - `.agent/skills/visual-consistency-and-magic-motion.md` — Consistência visual unificada (`website/src/index.css` + `ArcaneOrnaments.tsx` + ArcaneMP + HL native assets via `hmp-inventory`, `hmp-characters`, `hmp-audio`) e coreografia de animações mágicas suaves (`--ease-arcane`, `title-glint`, `[data-house-theme]`).
+  - Atualizados `.agent/guidelines/ui_ux.md`, `.agent/skills/create-ui-panel.md` (bridge real ArcaneMP `Web.createView` / `Web.emit` / `callEvent` + template visual espelhado do `website/`) e `.agent/global-rules/rules.md`.
+- Sincronizado `.agent/overview/PROJECT_STATUS.md`, `README.md` e `.agent/implementation-plans/master-plan.md`.
+
+---
+
 ## [0.2.0] — 2026-11-25
 
 ### Servidor ArcaneMP (`server/` + `client/`)

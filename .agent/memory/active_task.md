@@ -1,18 +1,17 @@
-# Tarefa Ativa
+# Active Task — VICCS Accio RP
 
-## Status: 🟢 FASE 1 CONCLUÍDA (Servidor Base ArcaneMP 1.15.1 Aberto Localmente)
+## Estado Atual
+- **Nenhuma implementação pendente em aberto** — ciclo de correções da **Fase 2 (Imersão, Controles `Alt`/`Esc`, Vestes Iniciais e Salão Principal)** concluído e validado em bateria automatizada (`31/31` testes aprovados).
+- **Ambiente local:** `0.0.0.0:27016` (`download-url: ""` em `server/server.json`), `34` resources JS ativos (`30` `hmp-*` + `4` `viccs-*`), MariaDB `hogwartsmp` em `127.0.0.1:3306`.
 
-## Última Fase Entregue
-1. **Setup & Abertura Local do Servidor ArcaneMP (`server/` + `client/`):**
-   - Instalado **ArcaneMP `1.15.1`** (`b8ce055`, Framework `44.1.1`) em `server/` (`ArcaneMPServer.exe`, `crashpad_handler.exe`, `libnode.dll`) e cliente em `client/` (`ArcaneMPLauncher.exe`).
-   - Instalado **HMP Foundations `v0.12.0`** completo (30 resources `hmp-*` em `server/resources/` e 26 JSONs em `server/data/`).
-   - Configurado banco local `hogwartsmp` no MariaDB `10.4.32` (XAMPP) com usuário dedicado em `server/data/hmp-mysql.json`, migrando automaticamente 37 tabelas e 17 entradas em `hmp_schema_migrations`.
-   - Porta ajustada para **`27016`** (UDP+TCP) em `server/server.json` devido a conflito local do `AppleMobileDeviceProcess.exe` na porta `127.0.0.1:27015`.
-   - Criado painel administrativo interativo **`Accio_Server_Manager.bat`** (`server/server-manager.ps1`) com modo Super Admin (`HMP_ADMIN_BOOTSTRAP_SECRET`), gestão de cargos no banco, backups `mysqldump`, editor de `server.json`, leitura de logs e verificação de conflito de porta.
-2. **Atualizações & Sincronização do Website (`website/` -> `accio_rp_website.git`):**
-   - Ajustado OAuth Discord, correção de avatar no header, lore anos 2000 (Diretor Aurelian Vale Diggory), hero full-bleed `logohigh_4x.jpg` com parallax por ponteiro, remoção do isotipo no navbar, emblemas oficiais das 4 Casas integrados na UI e em 1:1 sem distorção nos estandartes 3D (`CastleBanners3D.tsx`), e subtree enviado para `accio_rp_website.git` (`94e26d8`).
+## Última Entrega Verificada
+- Corrigidos no runtime real do ArcaneMP `1.15.1` / `hmp-lib`:
+  - Assinatura `handler(physicalKey, state)` e suporte a `alt`/`lalt`/`ralt` com debounce (`80ms`) no Olho Mágico (`viccs-ui/client/main.js`).
+  - Erro `attachCorners` → `injectFrameCorners` no Livro do Jogador (`viccs-ui/ui/book/app.js` + alias em `ornaments.js`) e pré-aquecimento das WebViews ocultas no `worldReady`.
+  - Substituição global de `PlayerManager.byId` inexistente por `PlayerManager.getById` (`resolveOnlinePlayer`) em `viccs-ui`, `viccs-characters` e `viccs-sorting`.
+  - Vestes escolares neutras (`Unaffiliated`: `Outfit_001_Basic` + `Back_001_Basic`) antes da Seleção e aplicação via `player.inventory.patch` (`give`) + `player.gear.equip` (`variation`).
+  - Teleporte automático para o Salão Principal (`FT_HW_GreatHall` via `player.fastTravel` + `playerFastTravelComplete`, ou `coordinates` configuráveis) antes da abertura automática do Chapéu Seletor.
 
-## Próximos Passos (Fase 2)
-- Criar os primeiros resources autorais `viccs-core`, `viccs-ui` e `viccs-characters` em `server/resources/`.
-- Conectar aprovação de fichas no Supabase (`character_applications`) ao banco de gameplay (`hogwartsmp`).
-- Antes da abertura pública: migrar o banco de produção para MySQL 8.x / MariaDB 10.6+, configurar `server-token` + `package-secret`, abrir portas UDP/TCP no roteador/firewall e endurecer políticas RLS do Supabase.
+## Próxima Ação
+1. Validar o fluxo completo ao vivo no cliente ArcaneMP conectado em `127.0.0.1:27016` (`ONE TWO` ou novo personagem → vestes iniciais → Salão Principal → Chapéu Seletor → Ficha/Varinha → `Alt` e `Esc`).
+2. Quando aprovado ao vivo, iniciar a **Fase 3 (`viccs-houses` / `viccs-spells`)**.

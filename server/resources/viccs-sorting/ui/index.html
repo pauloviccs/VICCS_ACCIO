@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR" data-house-theme="gryffindor">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACCIO — Cerimônia do Chapéu Seletor</title>
+    <link rel="stylesheet" href="fw://resources/viccs-ui/ui/tokens.css" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="hat-heading">
+        <section id="sorting-panel" class="frame sorting-shell">
+            <header class="sorting-header">
+                <div class="sorting-topbar">
+                    <p id="step-indicator" class="eyebrow">Cerimônia de Seleção</p>
+                    <button type="button" id="btn-pause" class="btn-secondary btn-pause hidden" aria-label="Pausar seleção e continuar depois">Pausar</button>
+                </div>
+                <p id="hat-whisper" class="whisper">Hmm... interessante...</p>
+                <h1 id="hat-heading" class="title sorting-title">O Chapéu Seletor</h1>
+                <div id="divider-slot"></div>
+            </header>
+
+            <div id="quiz-stage" class="stage">
+                <p id="question-category" class="question-cat"></p>
+                <p id="question-text" class="question-text"></p>
+                <div id="options-list" class="options-list"></div>
+            </div>
+
+            <div id="deliberation-stage" class="stage stage-center hidden">
+                <div class="deliberation-orb" aria-hidden="true"></div>
+                <p id="deliberation-text" class="deliberation-text"></p>
+            </div>
+
+            <div id="error-stage" class="stage stage-center hidden">
+                <p id="error-text" class="error-text"></p>
+                <div class="error-actions">
+                    <button type="button" id="btn-error-pause" class="btn-secondary">Pausar e Salvar</button>
+                    <button type="button" id="btn-error-retry" class="btn-primary">Tentar Confirmar Novamente</button>
+                </div>
+            </div>
+
+            <div id="result-stage" class="parchment-result hidden">
+                <img id="result-emblem" class="result-emblem" alt="" />
+                <p class="result-eyebrow">Veredito do Chapéu Seletor</p>
+                <h2 id="result-house" class="result-house"></h2>
+                <p id="result-motto" class="result-motto"></p>
+                <div id="result-letters" class="result-letters"></div>
+                <p id="result-robes-note" class="result-robes-note hidden"></p>
+                <div class="result-controls-guide">
+                    <span><strong>[ESC]</strong> Abrir Livro do Jogador</span>
+                    <span><strong>[ALT]</strong> Ativar Olho Mágico no Mundo</span>
+                </div>
+                <button type="button" id="btn-finish" class="btn-primary">Juntar-se à Mesa da Casa</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="fw://resources/viccs-ui/ui/ornaments.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+

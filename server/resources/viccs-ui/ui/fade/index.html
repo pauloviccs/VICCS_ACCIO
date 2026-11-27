@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR" data-house-theme="gryffindor">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACCIO — Transição</title>
+    <link rel="stylesheet" href="fw://resources/viccs-ui/ui/tokens.css" />
+    <style>
+        #curtain {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(ellipse at 50% 42%, rgba(201, 176, 122, 0.08), #05080f 68%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.55s var(--ease-arcane);
+        }
+        #curtain.active {
+            opacity: 1;
+        }
+        .curtain-copy {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 24px;
+        }
+        .curtain-caption {
+            font-family: var(--font-crimson);
+            font-style: italic;
+            font-size: 20px;
+            color: var(--color-ink);
+        }
+    </style>
+</head>
+<body>
+    <div id="curtain" aria-hidden="true">
+        <div class="curtain-copy">
+            <span id="curtain-eyebrow" class="eyebrow">Hogwarts · Ano Letivo</span>
+            <p id="curtain-caption" class="curtain-caption"></p>
+        </div>
+    </div>
+    <script>
+        'use strict';
+        const curtain = document.getElementById('curtain');
+        const eyebrowEl = document.getElementById('curtain-eyebrow');
+        const captionEl = document.getElementById('curtain-caption');
+
+        window.addEventListener('viccs:ui:fade', (event) => {
+            const d = event.detail || {};
+            const durationMs = Math.max(150, Math.min(2000, Number(d.durationMs) || 550));
+            curtain.style.transitionDuration = `${durationMs}ms`;
+            if (d.house) document.documentElement.setAttribute('data-house-theme', String(d.house));
+            if (d.eyebrow) eyebrowEl.textContent = String(d.eyebrow);
+            captionEl.textContent = d.caption ? String(d.caption) : '';
+            curtain.classList.toggle('active', d.direction !== 'out');
+        });
+
+        try { if (typeof callEvent === 'function') callEvent('ready', '{}'); } catch (_) {}
+    </script>
+</body>
+</html>
+

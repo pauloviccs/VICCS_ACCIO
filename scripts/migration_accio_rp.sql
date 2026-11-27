@@ -37,6 +37,13 @@ CREATE TABLE IF NOT EXISTS public.character_applications (
     pdf_url TEXT
 );
 
+-- Colunas de sincronia bidirecional Jogo <-> Site (Fase 2)
+ALTER TABLE public.character_applications ADD COLUMN IF NOT EXISTS sorted_house TEXT;
+ALTER TABLE public.character_applications ADD COLUMN IF NOT EXISTS secondary_house TEXT;
+ALTER TABLE public.character_applications ADD COLUMN IF NOT EXISTS is_hatstall BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.character_applications ADD COLUMN IF NOT EXISTS sorted_at TIMESTAMPTZ;
+ALTER TABLE public.character_applications ADD COLUMN IF NOT EXISTS game_character_id BIGINT;
+
 CREATE INDEX IF NOT EXISTS idx_character_applications_discord_id ON public.character_applications(discord_id);
 CREATE INDEX IF NOT EXISTS idx_character_applications_status ON public.character_applications(status);
 CREATE INDEX IF NOT EXISTS idx_character_applications_created_at ON public.character_applications(created_at DESC);
@@ -153,3 +160,114 @@ BEGIN
     END IF;
 END $$;
 
+
+-- ═══════════════════════════════════════════════════════════════
+-- 9. PONTE SEGURA JOGO <-> SITE (ANTI-SPOOFING TICKETS & CÓDIGOS)
+-- ═══════════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS public.server_join_tickets (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    token_hash TEXT NOT NULL UNIQUE,
+    discord_id TEXT NOT NULL,
+    application_id UUID REFERENCES public.character_applications(id) ON DELETE SET NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_server_join_tickets_discord_id
+    ON public.server_join_tickets (discord_id);
+
+CREATE INDEX IF NOT EXISTS idx_server_join_tickets_expires_at
+    ON public.server_join_tickets (expires_at);
+
+CREATE TABLE IF NOT EXISTS public.server_link_codes (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE,
+    discord_id TEXT NOT NULL,
+    application_id UUID REFERENCES public.character_applications(id) ON DELETE SET NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_server_link_codes_discord_id
+    ON public.server_link_codes (discord_id);
+
+ALTER TABLE public.server_join_tickets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.server_link_codes ENABLE ROW LEVEL SECURITY;
+
+-- Nota: Nenhuma política SELECT/INSERT/UPDATE para anon ou authenticated.
+-- Apenas a service_role do servidor consulta/consome tickets e códigos.
+
+-- RPC autenticada para gerar código único de vínculo Direct Connect (ex.: ACCIO-A1B2C3D4)
+CREATE OR REPLACE FUNCTION public.issue_server_link_code()
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth
+AS $$
+DECLARE
+    v_uid UUID;
+    v_discord_id TEXT;
+    v_app_id UUID;
+    v_app_status TEXT;
+    v_code TEXT;
+    v_expires_at TIMESTAMPTZ;
+BEGIN
+    v_uid := auth.uid();
+    IF v_uid IS NULL THEN
+        RAISE EXCEPTION 'Sessão Discord não autenticada no site.' USING ERRCODE = '42501';
+    END IF;
+
+    SELECT COALESCE(
+        (
+            SELECT NULLIF(i.provider_id, '')
+            FROM auth.identities i
+            WHERE i.user_id = v_uid AND i.provider = 'discord'
+            LIMIT 1
+        ),
+        NULLIF(u.raw_user_meta_data->>'provider_id', ''),
+        NULLIF(u.raw_user_meta_data->>'sub', '')
+    )
+    INTO v_discord_id
+    FROM auth.users u
+    WHERE u.id = v_uid;
+
+    IF v_discord_id IS NULL THEN
+        RAISE EXCEPTION 'Nenhuma conta Discord vinculada foi encontrada na sessão.' USING ERRCODE = '42501';
+    END IF;
+
+    SELECT id, status
+    INTO v_app_id, v_app_status
+    FROM public.character_applications
+    WHERE discord_id = v_discord_id
+    ORDER BY (CASE WHEN status = 'approved' THEN 0 ELSE 1 END), created_at DESC
+    LIMIT 1;
+
+    IF v_app_id IS NULL THEN
+        RAISE EXCEPTION 'Nenhuma inscrição foi encontrada para este Discord.' USING ERRCODE = 'P0002';
+    END IF;
+
+    UPDATE public.server_link_codes
+    SET used_at = NOW()
+    WHERE discord_id = v_discord_id
+      AND used_at IS NULL;
+
+    v_code := 'ACCIO-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 8));
+    v_expires_at := NOW() + INTERVAL '10 minutes';
+
+    INSERT INTO public.server_link_codes (code, discord_id, application_id, expires_at)
+    VALUES (v_code, v_discord_id, v_app_id, v_expires_at);
+
+    RETURN jsonb_build_object(
+        'code', v_code,
+        'expires_at', v_expires_at,
+        'application_id', v_app_id,
+        'application_status', v_app_status
+    );
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.issue_server_link_code() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.issue_server_link_code() TO authenticated;

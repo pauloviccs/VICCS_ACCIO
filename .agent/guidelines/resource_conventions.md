@@ -27,17 +27,19 @@ Todo resource DEVE seguir este template de manifesto:
         "clientScripts": [
             "client/main.js"
         ],
-        "sharedScripts": [
-            "shared/constants.js"
-        ],
         "files": [
+            "client/main.js",
             "ui/**/*"
         ],
-        "resourceDependencies": [
-            "hmp-lib",
-            "hmp-ui",
-            "viccs-core"
+        "exports": [
+            "status"
         ],
+        "resourceDependencies": [
+            { "name": "hmp-lib", "version": "0.12.0" },
+            { "name": "hmp-core", "version": "0.12.0" },
+            { "name": "viccs-core", "version": "1.0.0" }
+        ],
+        "errorBehavior": "stop",
         "priority": 50
     }
 }
@@ -46,13 +48,13 @@ Todo resource DEVE seguir este template de manifesto:
 ### Regras do package.json
 
 - `priority`: Valores menores carregam primeiro
-  - `0-9`: Core (hmp-mysql, hmp-lib)
-  - `10-19`: Foundation (hmp-core, hmp-ui)
-  - `20-39`: VICCS Core (viccs-core, viccs-ui)
-  - `40-59`: VICCS Systems (viccs-spells, viccs-inventory)
-  - `60-79`: VICCS Features (viccs-quests, viccs-housing)
-  - `80-99`: VICCS Addons (viccs-events, viccs-seasonal)
-- `resourceDependencies`: SEMPRE listar explicitamente. `viccs-core` é obrigatório para todo resource VICCS
+  - `-1000 a -250`: HMP Foundations (`hmp-mysql`, `hmp-lib`, `hmp-core`, `hmp-ui`, `hmp-houses`, etc.)
+  - `20-39`: VICCS Core (`viccs-core`, `viccs-ui`, `viccs-characters`)
+  - `40-59`: VICCS Systems (`viccs-spells`, `viccs-inventory`, `viccs-economy`)
+  - `60-79`: VICCS Features (`viccs-quests`, `viccs-housing`)
+  - `80-99`: VICCS Addons (`viccs-events`, `viccs-seasonal`)
+- `resourceDependencies`: SEMPRE listar explicitamente (preferencialmente com `{ "name": "...", "version": "..." }`, seguindo `hmp-*`). `viccs-core` é obrigatório para resources de gameplay VICCS.
+- `exports`: Declarar explicitamente no bloco `mafiahub.exports` cada chave registrada via `Exports.register(name, value)`.
 
 ## Estrutura de Diretórios Obrigatória
 
@@ -138,18 +140,19 @@ Events.on('viccs:spells:cast', (data) => {
 });
 ```
 
-### Padrão de APIs Compartilhadas
+### Padrão de APIs Compartilhadas (`Exports.register` & `Imports.get`)
 
-Resources podem expor funções via `exports`:
+Resources expõem funções/objetos via `Exports.register(...)` (declarados em `mafiahub.exports` no `package.json`) e consomem via `Imports.get(...)`:
 
 ```javascript
-// No viccs-core:
-exports('getCharacterData', async (characterId) => {
+// No viccs-core (server/main.js):
+Exports.register('getCharacterData', async (characterId) => {
     return await fetchCharacterFromDB(characterId);
 });
 
 // Em outro resource:
-const characterData = await exports['viccs-core'].getCharacterData(charId);
+const ViccsCore = Imports.get('viccs-core');
+const characterData = await ViccsCore.getCharacterData(charId);
 ```
 
 ## Config Files (config/default.json)
@@ -177,8 +180,20 @@ Toda configuração DEVE seguir este schema:
 ### Regras de Config
 
 1. SEMPRE inclua os campos `$schema`, `$resource`, `$version`, `$description`
-2. Use seções lógicas com nomes descritivos
-3. Valores numéricos DEVEM ter comentário explicando a unidade (ms, segundos, metros)
-4. Ranges DEVEM ter limites documentados
-5. Features toggles SEMPRE no topo como `featureToggles`
+2. Use seções lógicas com nomes descritivos e fáceis de manusear por operadores não-programadores
+3. Valores numéricos DEVEM ter comentário `//` explicando a unidade (ms, segundos, metros, pontos) e limites seguros
+4. Ranges DEVEM ter limites documentados e validados no carregamento (`Hmp.validation` / `validate`)
+5. Features toggles SEMPRE no topo como `featureToggles` (`enabled`, `debugMode`, flags granulares)
+6. Todo resource deve suportar **override em `server/data/viccs-{nome}.json`** mesclado sobre `config/default.json` via `Hmp.config.load` / `Hmp.config.merge`, mantendo compatibilidade com configs antigas através de `defaults` completos.
+
+## Contrato Universal do Ecossistema VICCS
+
+1. **`status()` Obrigatório:** Todo resource `viccs-*` exporta `status()` (`Exports.register('status', ...)`), retornando `{ resource, version, enabled, ready, dependencies, stats }` para saúde e telemetria unificada.
+2. **Importação Segura de Módulos Opcionais:** Dependências obrigatórias vão em `resourceDependencies` no `package.json`; integrações opcionais (ex.: `viccs-quests` ouvindo `viccs-spells`) devem usar `safeImport(name)` (`try { return Imports.get(name); } catch { return null; }`) e fallback limpo caso o módulo não esteja ativo — nunca quebrar spawn ou travar controles por indisponibilidade de módulo secundário.
+3. **Compatibilidade Universal de Payloads:** Eventos `viccs:{resource}:{ação}` e APIs exportadas nunca mudam assinaturas de forma destrutiva — novos campos são sempre opcionais e retrocompatíveis.
+4. **Higiene Client↔Server:** Eventos vindos do client usam `Events.emitServer(...)` no client e `Events.onClient(...)` no server com `Hmp.rateLimit` e `Hmp.validation`, além de `Hmp.input.controls` / `Hmp.input.shortcuts` para evitar conflitos de teclas e foco travado.
+5. **Experiência Imersiva Obrigatória (Fases 2–6):** Todo recurso voltado ao jogador deve seguir `server/.agent/scripting/regras-de-implementacao-experiencia-imersiva-accio.md`:
+   - Integrar interações de mundo ao **Olho Mágico (`Alt`)** (via `hmp-interact` / `viccs-ui.eye`) e sistemas pessoais ao **Livro do Jogador (`Esc`)** (via `viccs-ui.book`), evitando comandos de chat obrigatórios.
+   - Responder às **6 Perguntas Obrigatórias** (visão/ação, resposta/conclusão, cancelamento/recuperação, autoridade/persistência, API real do ArcaneMP e preservação do front-end) antes de considerar o sistema concluído.
+   - Em áudios (`hmp-audio` / `viccs-ui.audioCue`), usar apenas cues breves one-shot e interromper handles anteriores para impedir loops.
 

@@ -82,34 +82,36 @@ Usados pelo viccs-core para lifecycle do servidor.
 'viccs:core:resourceLoaded'    // Um resource terminou de carregar
 ```
 
-## Padrão de Exports
+## Padrão de Exports (`Exports.register` & `Imports.get`)
 
-Resources podem expor funções síncronas ou assíncronas:
+Resources expõem funções ou namespaces declarados em `mafiahub.exports` no `package.json`:
 
 ### Expondo uma API
 
 ```javascript
 // No viccs-economy (server/main.js)
+// package.json -> "exports": ["wallet"]
 
-exports('getBalance', async (characterId) => {
-    const wallet = await db.getWallet(characterId);
-    return {
-        galleons: wallet.galleons,
-        sickles: wallet.sickles,
-        knuts: wallet.knuts,
-    };
-});
-
-exports('deductBalance', async (characterId, amount, reason) => {
-    const success = await db.deductGalleons(characterId, amount);
-    if (success) {
-        Events.emit('viccs:economy:transaction', {
-            characterId,
-            amount: -amount,
-            reason,
-        });
-    }
-    return success;
+Exports.register('wallet', {
+    async getBalance(characterId) {
+        const w = await db.getWallet(characterId);
+        return {
+            galleons: w.galleons,
+            sickles: w.sickles,
+            knuts: w.knuts,
+        };
+    },
+    async deductBalance(characterId, amount, reason) {
+        const success = await db.deductGalleons(characterId, amount);
+        if (success) {
+            Events.emit('viccs:economy:transaction', {
+                characterId,
+                amount: -amount,
+                reason,
+            });
+        }
+        return success;
+    },
 });
 ```
 
@@ -117,10 +119,12 @@ exports('deductBalance', async (characterId, amount, reason) => {
 
 ```javascript
 // No viccs-shops (server/events.js)
+const Economy = Imports.get('viccs-economy');
+const Inventory = Imports.get('viccs-inventory');
 
 async function handlePurchase(player, itemId) {
     const price = getItemPrice(itemId);
-    const balance = await exports['viccs-economy'].getBalance(player.characterId);
+    const balance = await Economy.wallet.getBalance(player.characterId);
 
     if (balance.galleons < price) {
         Events.emit(player, 'viccs:ui:notify', {
@@ -130,14 +134,14 @@ async function handlePurchase(player, itemId) {
         return;
     }
 
-    const deducted = await exports['viccs-economy'].deductBalance(
+    const deducted = await Economy.wallet.deductBalance(
         player.characterId,
         price,
         `Compra: ${itemId}`,
     );
 
     if (deducted) {
-        await exports['viccs-inventory'].addItem(player.characterId, itemId, 1);
+        await Inventory.addItem(player.characterId, itemId, 1);
         Events.emit(player, 'viccs:ui:notify', {
             type: 'success',
             message: 'Compra realizada com sucesso!',
@@ -192,8 +196,9 @@ Events.emit('viccs:spells:requestCast', {
 // ❌ ERRADO: Import direto de outro resource
 const spellManager = require('../../viccs-spells/server/main');
 
-// ✅ CORRETO: Usar exports
-const spellData = await exports['viccs-spells'].getSpellData(spellId);
+// ✅ CORRETO: Usar Imports.get()
+const SpellsApi = Imports.get('viccs-spells');
+const spellData = await SpellsApi.getSpellData(spellId);
 
 // ❌ ERRADO: Evento sem namespace
 Events.emit('spellCast', data);

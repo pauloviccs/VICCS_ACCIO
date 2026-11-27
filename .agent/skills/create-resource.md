@@ -53,17 +53,21 @@ server/resources/viccs-{nome}/
     "mafiahub": {
         "serverScripts": ["server/main.js"],
         "clientScripts": ["client/main.js"],
-        "sharedScripts": ["shared/constants.js"],
-        "files": ["ui/**/*"],
-        "resourceDependencies": ["hmp-lib", "hmp-ui", "viccs-core"],
+        "files": ["client/main.js", "ui/**/*"],
+        "exports": ["status"],
+        "resourceDependencies": [
+            { "name": "hmp-lib", "version": "0.12.0" },
+            { "name": "hmp-ui", "version": "0.12.0" },
+            { "name": "viccs-core", "version": "1.0.0" }
+        ],
+        "errorBehavior": "stop",
         "priority": 50
     }
 }
 ```
 
 **Regras de Priority:**
-- 0-9: Drivers (hmp-mysql)
-- 10-19: Framework (hmp-core, hmp-lib)
+- -1000 a -250: HMP Foundations (`hmp-mysql`, `hmp-lib`, `hmp-core`, `hmp-ui`, etc.)
 - 20-39: VICCS Core
 - 40-59: VICCS Systems
 - 60-79: VICCS Features
@@ -125,20 +129,24 @@ function registerEvents() {
 
 ### Passo 7: Implementar Persistência
 
-Em `server/database.js`, usar `hmp-mysql` para queries:
+Em `server/database.js`, usar `Imports.get('hmp-mysql')` e `MySQL.migrate(...)` (com versionamento em `hmp_schema_migrations`):
 
 ```javascript
-const mysql = exports['hmp-mysql'];
+const MySQL = Imports.get('hmp-mysql');
 
 async function initDatabase() {
-    await mysql.query(`
-        CREATE TABLE IF NOT EXISTS viccs_{tabela} (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            character_id INT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            INDEX idx_character (character_id)
-        )
-    `);
+    await MySQL.migrate('viccs-{nome}', [
+        {
+            version: 1,
+            name: 'create viccs_{tabela}',
+            up: `CREATE TABLE IF NOT EXISTS viccs_{tabela} (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                character_id INT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_character (character_id)
+            ) ENGINE=InnoDB`,
+        },
+    ]);
 }
 ```
 

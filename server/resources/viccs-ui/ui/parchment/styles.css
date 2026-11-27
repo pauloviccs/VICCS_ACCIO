@@ -1,0 +1,141 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+        radial-gradient(ellipse at 50% 25%, rgba(201, 176, 122, 0.1), transparent 62%),
+        rgba(5, 8, 15, 0.76);
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.parchment-shell {
+    position: relative;
+    width: min(620px, 92vw);
+    max-height: 82vh;
+    padding: 42px 44px 32px;
+    background:
+        radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.35), transparent 45%),
+        linear-gradient(165deg, #f6eedc 0%, #efe1c4 52%, #eadbc0 100%);
+    color: #23190e;
+    border: 1px solid #b89858;
+    box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.72),
+        inset 0 0 0 6px rgba(156, 127, 74, 0.16),
+        inset 0 0 42px rgba(132, 97, 45, 0.18);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: parchmentArrive 0.36s var(--ease-sheet) forwards;
+}
+
+.wax-seal {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle at 35% 30%, #9b2226 0%, #631114 75%, #410a0c 100%);
+    color: #f4d898;
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    border: 2px solid rgba(234, 214, 166, 0.35);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+    transform: rotate(-8deg);
+}
+
+.parchment-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.house-emblem {
+    width: 68px;
+    height: 68px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.28));
+}
+
+.house-emblem.hidden {
+    display: none;
+}
+
+.eyebrow-ink {
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #7c5c2b;
+    font-weight: 700;
+}
+
+.parchment-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #1f160c;
+}
+
+.parchment-divider {
+    color: #8c6a35;
+    margin: 6px auto 14px;
+}
+
+.parchment-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+    font-family: var(--font-crimson);
+    font-size: 18px;
+    line-height: 1.65;
+    color: #2b1f13;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.parchment-footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(140, 106, 53, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.parchment-signature {
+    font-family: var(--font-crimson);
+    font-style: italic;
+    font-size: 16px;
+    color: #4f3a20;
+}
+
+.parchment-actions {
+    margin-left: auto;
+}
+
+@keyframes parchmentArrive {
+    0% { opacity: 0; transform: scale(0.94) translateY(14px) rotateX(6deg); }
+    100% { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); }
+}
+
+@keyframes parchmentLeave {
+    0% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.95) translateY(10px); }
+}
+

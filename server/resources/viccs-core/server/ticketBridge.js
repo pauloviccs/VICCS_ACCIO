@@ -77,7 +77,7 @@ function createTicketBridge({ core, config, logger }) {
         };
     }
 
-    async function redeemLinkCodeForPlayer(player, rawCode) {
+    async function validateLinkCodeRow(player, rawCode) {
         if (!player || !rawCode) return { ok: false, reason: 'Código inválido.' };
         if (!isConfigured()) return { ok: false, reason: 'Ponte de verificação Supabase desativada no servidor.' };
 
@@ -100,13 +100,51 @@ function createTicketBridge({ core, config, logger }) {
             return { ok: false, reason: 'Código não encontrado, expirado ou já utilizado.' };
         }
 
+        return {
+            ok: true,
+            code,
+            session,
+            row,
+            discordId: String(row.discord_id),
+            applicationId: row.application_id ? String(row.application_id) : null,
+            expiresAt: row.expires_at || null,
+        };
+    }
+
+    /**
+     * Valida o código do personagem sem marcá-lo como usado (para pré-visualização no criador 3D).
+     */
+    async function previewLinkCode(player, rawCode) {
+        const checked = await validateLinkCodeRow(player, rawCode);
+        if (!checked.ok) return checked;
+        return {
+            ok: true,
+            code: checked.code,
+            discordId: checked.discordId,
+            applicationId: checked.applicationId,
+            expiresAt: checked.expiresAt,
+        };
+    }
+
+    /**
+     * Consome atomicamente o código validado após confirmação real (criação ou vínculo).
+     */
+    async function redeemLinkCodeForPlayer(player, rawCode, options = {}) {
+        const checked = await validateLinkCodeRow(player, rawCode);
+        if (!checked.ok) return checked;
+
+        if (options.expectedDiscordId && checked.discordId !== String(options.expectedDiscordId)) {
+            return { ok: false, reason: 'O código informado não corresponde ao Discord autorizado.' };
+        }
+
+        const nowIso = new Date().toISOString();
         const patched = await supabaseFetch(
-            `server_link_codes?code=eq.${encodeURIComponent(code)}&used_at=is.null`,
+            `server_link_codes?code=eq.${encodeURIComponent(checked.code)}&used_at=is.null&expires_at=gt.${encodeURIComponent(nowIso)}`,
             { method: 'PATCH', body: { used_at: nowIso } },
         );
         const consumed = Array.isArray(patched) ? patched[0] : null;
         if (!consumed) {
-            return { ok: false, reason: 'Este código já foi resgatado.' };
+            return { ok: false, reason: 'Este código já foi resgatado ou expirou.' };
         }
 
         const principal = {
@@ -116,7 +154,7 @@ function createTicketBridge({ core, config, logger }) {
         };
 
         try {
-            const linked = await core.accounts.linkIdentity(session.account.id, principal);
+            const linked = await core.accounts.linkIdentity(checked.session.account.id, principal);
             if (!linked) {
                 return { ok: false, reason: 'Este Discord já está vinculado a outra conta no servidor.' };
             }
@@ -187,7 +225,9 @@ function createTicketBridge({ core, config, logger }) {
         PROVIDER_NAME,
         isConfigured,
         registerWithCore,
+        previewLinkCode,
         redeemLinkCodeForPlayer,
+        consumeLinkCodeForPlayer: redeemLinkCodeForPlayer,
         getVerifiedSession,
         clearPlayer,
     };

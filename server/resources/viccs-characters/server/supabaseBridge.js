@@ -54,12 +54,28 @@ function createSupabaseBridge({ config, logger }) {
         return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
     }
 
-    async function fetchApplicationById(applicationId) {
+    async function fetchApplicationById(applicationId, { requireApproved = true } = {}) {
         if (!isConfigured() || !applicationId) return null;
+        const statusFilter = requireApproved ? '&status=eq.approved' : '';
         const rows = await request(
-            `character_applications?id=eq.${encodeURIComponent(String(applicationId))}&status=eq.approved&limit=1`,
+            `character_applications?id=eq.${encodeURIComponent(String(applicationId))}${statusFilter}&limit=1`,
         );
         return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+    }
+
+    async function linkGameCharacter({ applicationId, gameCharacterId }) {
+        if (!isConfigured() || !applicationId || !gameCharacterId) return false;
+        const patched = await request(
+            `character_applications?id=eq.${encodeURIComponent(String(applicationId))}`,
+            {
+                method: 'PATCH',
+                body: {
+                    game_character_id: Number(gameCharacterId),
+                    updated_at: new Date().toISOString(),
+                },
+            },
+        );
+        return Array.isArray(patched) && patched.length > 0;
     }
 
     async function syncSortingOutcome({ applicationId, sortedHouse, secondaryHouse, isHatstall, gameCharacterId }) {
@@ -84,6 +100,7 @@ function createSupabaseBridge({ config, logger }) {
         isConfigured,
         fetchApprovedApplication,
         fetchApplicationById,
+        linkGameCharacter,
         syncSortingOutcome,
     };
 }

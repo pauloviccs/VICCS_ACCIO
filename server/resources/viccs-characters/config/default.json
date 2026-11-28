@@ -8,6 +8,8 @@
         "enabled": true,
         "debugMode": false,
         "supabaseSync": false,
+        "requireCreationCode": true,
+        "requireApprovedApplication": true,
         "requireWhitelistVerification": false,
         "allowAssertedDiscordInDev": true,
         "autoApplyHouseFromWhitelist": false,

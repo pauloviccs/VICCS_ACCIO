@@ -140,7 +140,9 @@ const registryApi = Object.freeze({
 const authApi = Object.freeze({
     isTicketBridgeConfigured: () => ticketBridge.isConfigured(),
     getVerifiedSession: (player) => ticketBridge.getVerifiedSession(player),
-    redeemLinkCode: (player, code) => ticketBridge.redeemLinkCodeForPlayer(player, code),
+    previewLinkCode: (player, code) => ticketBridge.previewLinkCode(player, code),
+    consumeLinkCode: (player, code, options) => ticketBridge.consumeLinkCodeForPlayer(player, code, options),
+    redeemLinkCode: (player, code, options) => ticketBridge.redeemLinkCodeForPlayer(player, code, options),
 });
 
 const ecosystemApi = Object.freeze({

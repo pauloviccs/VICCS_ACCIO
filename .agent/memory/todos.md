@@ -1,6 +1,7 @@
 # TODO List — VICCS Accio HL Server
 
 ## Fase 0 — Biblioteca de Contexto & Governança ✅
+
 - [x] Criar `.agent/context/architecture.md`
 - [x] Criar `.agent/context/stack.md`
 - [x] Criar `.agent/context/database_schema.md`
@@ -14,6 +15,7 @@
 - [x] Criar e sincronizar `.agent/overview/PROJECT_STATUS.md`
 
 ## Plataforma Web & Pré-Registro (Entregue Antecipadamente) ✅
+
 - [x] Scaffolding do projeto web com Vite 6, React 19, TypeScript e Tailwind CSS v4 (`website/`)
 - [x] Modal interativo da Carta de Hogwarts abrindo em perspectiva 3D na primeira visita (`HogwartsLetterModal`)
 - [x] Autenticação OAuth2 via Discord associada ao pré-registro oficial
@@ -32,6 +34,7 @@
 - [x] Auditoria e sincronização completa de documentação (`README.md`, `website/README.md`, `.agent/`)
 
 ## Fase 1 — Setup do Servidor Arcane MP ✅ (Ambiente Local Operacional)
+
 - [x] Instalar Arcane MP Server (`1.15.1` / Framework `44.1.1`) no diretório `server/` e launcher em `client/`
 - [x] Configurar `server.json` (porta `27016` UDP/TCP local para evitar conflito com Apple Devices em `27015`, `maxplayers: 32`)
 - [x] Configurar banco MariaDB local (`hogwartsmp` via `hmp-mysql` + usuário dedicado)
@@ -42,8 +45,9 @@
 - [ ] Endurecer políticas RLS do Supabase e atualizar banco para MySQL 8.x / MariaDB 10.6+ antes da abertura pública em larga escala
 
 ## Fase 2 — Core Resources, Ponte Universal, Visual & PT-BR 🟡 (Implementado · Em Validação Ao Vivo)
+
 - [x] Desenvolver `viccs-core` (identidade, `EraGate`, `ticketBridge`, auditoria, `safeImport` e eventos compartilhados)
-- [x] Desenvolver `viccs-ui` (kit visual `tokens.css`, `ornaments.js`, Pergaminho, Fade, Olho Mágico `Alt` e sincronia de tema por casa)
+- [x] Desenvolver `viccs-ui` (kit visual `tokens.css`, `ornaments.js`, Pergaminho, Fade, Olho Mágico `Alt`, Livro do Jogador `Esc` e sincronia de tema por casa)
 - [x] Desenvolver `viccs-characters` (perfis, 11 famílias de varinhas, ponte Supabase e pré-preenchimento do criador)
 - [x] Desenvolver `viccs-sorting` (motor do Chapéu Seletor com 12 dilemas, Hatstall `< 1.6`, persistência `viccs_sorting_sessions` e integração `hmp-houses`)
 - [x] Construir Ponte Universal do Ecossistema (`viccs-core/server/ecosystemBridge.js`) conectando os 30 `hmp-*` e 4 `viccs-*`
@@ -56,6 +60,7 @@
 - [ ] Validar em cliente gráfico ao vivo (áudio pós-Chapéu Seletor, vínculo `ACCIO-*`, pré-preenchimento do criador e todas as WebViews PT-BR)
 
 ## Fase 3 — Sistemas de Gameplay ⏳
+
 - [ ] `viccs-spells` (magias customizadas, cooldowns e partículas)
 - [ ] `viccs-inventory` (inventário com slots de varinha e cabos)
 - [ ] `viccs-economy` (sistema econômico de Galeões, Sicles e Knuts)
@@ -64,6 +69,7 @@
 - [ ] `viccs-quests` (missões dinâmicas e chains)
 
 ## Fase 4 — Mundo e Imersão ⏳
+
 - [ ] `viccs-world` (clima dinâmico, ciclo dia/noite, estações)
 - [ ] `viccs-npc` (NPCs com inteligência, schedules e diálogos)
 - [ ] `viccs-beasts` (criaturas mágicas e vivários)
@@ -72,17 +78,19 @@
 - [ ] `viccs-social` (chat RP por proximidade, emotes e correio coruja)
 
 ## Fase 5 — Administração e Integração Plataforma ⏳
+
 - [ ] `viccs-admin` (painel in-game para moderação e anti-cheat server-side)
 - [ ] Mover Webhook URL do Discord (`constants.ts`) para Supabase Edge Function / variável server-side segura
 
 ## Fase 6 — Polish e Launch ⏳
+
 - [ ] Testes de carga e stress testing
 - [ ] Balanceamento geral de feitiços e economia
 - [ ] Beta fechado para pioneiros pré-registrados
 - [ ] Lançamento público oficial
 
-
 ## Imersão, Controles & Fluxo Pós-Spawn Fase 2 (Concluído em 2026-11-27) ✅
+
 - [x] Governança imersiva (`Alt` vs `Esc` e 6 perguntas) propagada para Fases 2 a 6 em `.agent/`
 - [x] `viccs-core`: snapshot do Livro do Jogador, análise de vestes (`summarizeRobesInventory`) e serviços `'book'` / `'reapply-robes'`
 - [x] `viccs-ui`: `Alt` Olho Mágico (`handler(physicalKey, state)`, `alt`/`lalt`/`ralt` com debounce e revalidação server-side)

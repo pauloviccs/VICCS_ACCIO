@@ -16,6 +16,26 @@ const {
 function createHandlers({ hmp, core, houses, viccsCore, viccsUi, database, supabaseBridge, config, events, logger }) {
     const linkRateLimiter = hmp.rateLimit.create({ limit: 5, windowMs: 10000 });
     const pendingIntroTriggers = new Set();
+    const pendingCreatorClaims = new Map();
+
+    function isCreationCodeRequired() {
+        return Boolean(
+            config.featureToggles?.requireCreationCode !== false
+            && supabaseBridge.isConfigured()
+            && viccsCore.auth.isTicketBridgeConfigured?.(),
+        );
+    }
+
+    function sendCreatorPolicy(player) {
+        if (!player || typeof player.emit !== 'function') return;
+        const claim = pendingCreatorClaims.get(player.id) || null;
+        player.emit('viccs:characters:creator:policy', JSON.stringify({
+            requireCode: isCreationCodeRequired(),
+            requireApproved: config.featureToggles?.requireApprovedApplication !== false,
+            synced: Boolean(claim),
+            prefill: claim?.prefill || null,
+        }));
+    }
 
     function resolveOnlinePlayer(playerOrId) {
         if (playerOrId && typeof playerOrId === 'object' && 'id' in playerOrId) {
@@ -94,9 +114,12 @@ function createHandlers({ hmp, core, houses, viccsCore, viccsUi, database, supab
                 birthDate: whitelistData?.birthDate || profile?.birth_date || '',
                 birthPlace: whitelistData?.birthPlace || profile?.birth_place || config.defaults?.defaultBirthPlace || 'Grã-Bretanha',
                 bloodStatus: whitelistData?.bloodStatus || profile?.blood_status || config.defaults?.defaultBloodStatus || 'half-blood',
+                dormitory: whitelistData?.dormitory || profile?.dormitory || 'wizard',
                 academicYear: Number(profile?.academic_year || config.defaults?.startingAcademicYear || 1),
                 patronus: whitelistData?.patronus || profile?.patronus || '',
+                preferredHouse: whitelistData?.preferredHouse || profile?.preferred_house || null,
                 characterBackstory: whitelistData?.characterBackstory || profile?.character_backstory || null,
+                wordCount: whitelistData?.wordCount || profile?.word_count || 0,
                 house: profile?.house || null,
                 secondaryHouse: profile?.secondary_house || null,
                 hatstall: Boolean(profile?.hatstall),
@@ -429,6 +452,8 @@ function createHandlers({ hmp, core, houses, viccsCore, viccsUi, database, supab
     async function pushCreatorPrefill(session) {
         const player = session?.player;
         if (!player || typeof player.emit !== 'function') return;
+        sendCreatorPolicy(player);
+
         const identity = resolveTrustedDiscord(session);
         if (!identity || !supabaseBridge.isConfigured()) return;
 
@@ -436,11 +461,176 @@ function createHandlers({ hmp, core, houses, viccsCore, viccsUi, database, supab
             const approved = identity.applicationId
                 ? await supabaseBridge.fetchApplicationById(identity.applicationId)
                 : await supabaseBridge.fetchApprovedApplication(identity.discordId);
-            const prefill = buildCreatorPrefillFromApplication(approved);
+            const prefill = buildCreatorPrefillFromApplication(approved, config.wandHandles);
             if (!prefill) return;
 
             player.emit('viccs:characters:creatorPrefill', JSON.stringify(prefill));
         } catch (_) {}
+    }
+
+    async function verifyCreatorCodeForPlayer(player, rawCode) {
+        if (!player || typeof player.emit !== 'function') return { ok: false, reason: 'Jogador inválido.' };
+        const fail = (reason) => {
+            player.emit('viccs:characters:creator:codeResult', JSON.stringify({ ok: false, reason }));
+            return { ok: false, reason };
+        };
+
+        if (!viccsCore.auth.previewLinkCode) {
+            return fail('Ponte de verificação não disponível nesta versão do viccs-core.');
+        }
+
+        const preview = await viccsCore.auth.previewLinkCode(player, rawCode);
+        if (!preview?.ok) {
+            return fail(preview?.reason || 'Código inválido ou expirado.');
+        }
+
+        if (!supabaseBridge.isConfigured()) {
+            return fail('Sincronização com Supabase desativada no servidor.');
+        }
+
+        const requireApproved = config.featureToggles?.requireApprovedApplication !== false;
+        const app = preview.applicationId
+            ? await supabaseBridge.fetchApplicationById(preview.applicationId, { requireApproved: false })
+            : await supabaseBridge.fetchApprovedApplication(preview.discordId);
+
+        if (!app) {
+            return fail('Nenhuma ficha correspondente a este código foi encontrada no Livro da Admissão.');
+        }
+
+        if (requireApproved && app.status !== 'approved') {
+            const label = app.status === 'rejected'
+                ? 'rejeitada pela moderação'
+                : 'aguardando aprovação ministerial';
+            return fail(`Esta ficha está ${label}. Aguarde a aprovação no site antes de criar o personagem.`);
+        }
+
+        if (app.game_character_id || await database.isApplicationClaimedElsewhere(app.id, 0)) {
+            return fail('Esta ficha já foi vinculada a outro personagem criado no servidor.');
+        }
+
+        const normalizedProfile = normalizeApplicationToProfile(app, config.defaults, config.wandHandles);
+        const prefill = buildCreatorPrefillFromApplication(app, config.wandHandles);
+        if (!normalizedProfile || !prefill) {
+            return fail('Dados incompletos na ficha do site para sincronização.');
+        }
+
+        pendingCreatorClaims.set(player.id, {
+            code: preview.code,
+            discordId: preview.discordId,
+            application: app,
+            normalizedProfile,
+            prefill,
+            verifiedAt: Date.now(),
+        });
+
+        sendCreatorPolicy(player);
+        player.emit('viccs:characters:creator:codeResult', JSON.stringify({
+            ok: true,
+            code: preview.code,
+            prefill,
+        }));
+        player.emit('viccs:characters:creatorPrefill', JSON.stringify(prefill));
+        return { ok: true, prefill };
+    }
+
+    function prepareCreationForPlayer(player) {
+        if (!player) return { ok: false, reason: 'Sessão inválida.' };
+        const claim = pendingCreatorClaims.get(player.id) || null;
+        if (!claim) {
+            if (isCreationCodeRequired()) {
+                return {
+                    ok: false,
+                    reason: 'Gere seu Código do Personagem no site e valide-o aqui antes de confirmar.',
+                };
+            }
+            return { ok: true, claim: null };
+        }
+        return {
+            ok: true,
+            claim: {
+                code: claim.code,
+                applicationId: claim.application?.id || null,
+                prefill: claim.prefill,
+            },
+        };
+    }
+
+    async function commitCreatorClaimForCharacter(session, character) {
+        const player = session?.player;
+        if (!player || !character?.id) return false;
+        const claim = pendingCreatorClaims.get(player.id);
+        if (!claim) return false;
+        pendingCreatorClaims.delete(player.id);
+
+        try {
+            const redeemed = await viccsCore.auth.consumeLinkCode(player, claim.code, {
+                expectedDiscordId: claim.discordId,
+            });
+            if (!redeemed?.ok) {
+                logger.warn(`Código ${claim.code} não pôde ser consumido na criação de #${character.id}: ${redeemed?.reason || 'erro'}`);
+                return false;
+            }
+
+            const p = claim.normalizedProfile;
+            await database.upsertProfile(character.id, {
+                supabaseApplicationId: p.supabaseApplicationId,
+                discordId: p.discordId || claim.discordId,
+                fullName: p.fullName || character.name,
+                birthDate: p.birthDate,
+                birthPlace: p.birthPlace,
+                bloodStatus: p.bloodStatus,
+                dormitory: p.dormitory,
+                academicYear: Number(config.defaults?.startingAcademicYear || 1),
+                patronus: p.patronus,
+                preferredHouse: p.preferredHouse,
+                characterBackstory: p.characterBackstory,
+                wordCount: p.wordCount,
+                house: null,
+                secondaryHouse: null,
+                hatstall: false,
+                introCompleted: false,
+            });
+
+            const handle = resolveWandHandle(p.wand?.handleId, config.wandHandles);
+            await database.upsertWand(character.id, {
+                wood: p.wand.wood,
+                core: p.wand.core,
+                length: p.wand.length,
+                flexibility: p.wand.flexibility,
+                handleId: handle.id,
+            });
+
+            if (p.supabaseApplicationId && supabaseBridge.linkGameCharacter) {
+                await supabaseBridge.linkGameCharacter({
+                    applicationId: p.supabaseApplicationId,
+                    gameCharacterId: character.id,
+                });
+            }
+
+            if (viccsCore.audit?.record) {
+                await viccsCore.audit.record({
+                    resource: 'viccs-characters',
+                    action: 'character.synced_on_create',
+                    actorCharacterId: character.id,
+                    actorName: character.name || p.fullName || 'Jogador',
+                    targetCharacterId: character.id,
+                    reason: `Ficha ${p.supabaseApplicationId || claim.code} sincronizada no criador`,
+                    after: {
+                        applicationId: p.supabaseApplicationId,
+                        dormitory: p.dormitory,
+                        wandHandle: handle.id,
+                        wordCount: p.wordCount,
+                    },
+                });
+            }
+
+            events.emit('viccs:auth:linked', { playerId: player.id, characterId: character.id });
+            logger.info(`Personagem #${character.id} (${character.name}) sincronizado integralmente via código ${claim.code}`);
+            return true;
+        } catch (error) {
+            logger.warn(`Erro ao consolidar sincronia de #${character.id}: ${error instanceof Error ? error.message : String(error)}`);
+            return false;
+        }
     }
 
     function openLinkModal(player) {
@@ -460,6 +650,40 @@ function createHandlers({ hmp, core, houses, viccsCore, viccsUi, database, supab
             if (session?.player) {
                 void pushCreatorPrefill(session);
             }
+        });
+
+        events.on('hmp:character:created', async (payload) => {
+            const session = payload?.session;
+            const character = payload?.character;
+            if (!session?.player || !character) return;
+            await commitCreatorClaimForCharacter(session, character);
+        });
+
+        events.onClient('viccs:characters:creator:opened', (player) => {
+            if (player) sendCreatorPolicy(player);
+        });
+
+        events.onClient('viccs:characters:creator:verifyCode', async (player, raw) => {
+            if (!player || !linkRateLimiter.allow(player.id)) return;
+            let payload = {};
+            try {
+                payload = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+            } catch (_) {
+                return;
+            }
+            await verifyCreatorCodeForPlayer(player, payload.code);
+        });
+
+        events.onClient('viccs:characters:creator:clearCode', (player) => {
+            if (!player) return;
+            pendingCreatorClaims.delete(player.id);
+            sendCreatorPolicy(player);
+        });
+
+        events.onClient('hmp-characters:cancelled', (player) => {
+            if (!player) return;
+            pendingCreatorClaims.delete(player.id);
+            sendCreatorPolicy(player);
         });
 
         events.on('hmp:character:loaded', async (payload) => {
@@ -605,7 +829,10 @@ function createHandlers({ hmp, core, houses, viccsCore, viccsUi, database, supab
         });
 
         events.on('playerDisconnect', (player) => {
-            if (player) pendingIntroTriggers.delete(player.id);
+            if (player) {
+                pendingIntroTriggers.delete(player.id);
+                pendingCreatorClaims.delete(player.id);
+            }
         });
     }
 
@@ -614,6 +841,10 @@ function createHandlers({ hmp, core, houses, viccsCore, viccsUi, database, supab
         applyHouseRobesForPlayer,
         openSheetForPlayer,
         openLinkModal,
+        isCreationCodeRequired,
+        verifyCreatorCodeForPlayer,
+        prepareCreationForPlayer,
+        commitCreatorClaimForCharacter,
         registerEvents,
     };
 }

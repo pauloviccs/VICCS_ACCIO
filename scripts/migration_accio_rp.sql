@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS public.character_applications (
     pdf_url TEXT
 );
 
--- Colunas de sincronia bidirecional Jogo <-> Site (Fase 2)
+-- Colunas de sincronia bidirecional Jogo <-> Site (Fase 2) & Dormitório
+ALTER TABLE public.character_applications ADD COLUMN IF NOT EXISTS dormitory TEXT NOT NULL DEFAULT 'wizard';
 ALTER TABLE public.character_applications ADD COLUMN IF NOT EXISTS sorted_house TEXT;
 ALTER TABLE public.character_applications ADD COLUMN IF NOT EXISTS secondary_house TEXT;
 ALTER TABLE public.character_applications ADD COLUMN IF NOT EXISTS is_hatstall BOOLEAN NOT NULL DEFAULT false;
@@ -200,8 +201,11 @@ ALTER TABLE public.server_link_codes ENABLE ROW LEVEL SECURITY;
 -- Nota: Nenhuma política SELECT/INSERT/UPDATE para anon ou authenticated.
 -- Apenas a service_role do servidor consulta/consome tickets e códigos.
 
--- RPC autenticada para gerar código único de vínculo Direct Connect (ex.: ACCIO-A1B2C3D4)
-CREATE OR REPLACE FUNCTION public.issue_server_link_code()
+-- Remover assinatura antiga sem parâmetros para evitar ambiguidade RPC no PostgREST
+DROP FUNCTION IF EXISTS public.issue_server_link_code();
+
+-- RPC autenticada para gerar código único de vínculo/criação por ficha (ex.: ACCIO-A1B2C3D4)
+CREATE OR REPLACE FUNCTION public.issue_server_link_code(p_application_id UUID DEFAULT NULL)
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -212,6 +216,10 @@ DECLARE
     v_discord_id TEXT;
     v_app_id UUID;
     v_app_status TEXT;
+    v_char_name TEXT;
+    v_house TEXT;
+    v_dormitory TEXT;
+    v_game_char_id BIGINT;
     v_code TEXT;
     v_expires_at TIMESTAMPTZ;
 BEGIN
@@ -238,24 +246,41 @@ BEGIN
         RAISE EXCEPTION 'Nenhuma conta Discord vinculada foi encontrada na sessão.' USING ERRCODE = '42501';
     END IF;
 
-    SELECT id, status
-    INTO v_app_id, v_app_status
-    FROM public.character_applications
-    WHERE discord_id = v_discord_id
-    ORDER BY (CASE WHEN status = 'approved' THEN 0 ELSE 1 END), created_at DESC
-    LIMIT 1;
+    IF p_application_id IS NOT NULL THEN
+        SELECT id, status, trim(first_name || ' ' || last_name), preferred_house, dormitory, game_character_id
+        INTO v_app_id, v_app_status, v_char_name, v_house, v_dormitory, v_game_char_id
+        FROM public.character_applications
+        WHERE id = p_application_id
+          AND discord_id = v_discord_id
+        LIMIT 1;
+    ELSE
+        SELECT id, status, trim(first_name || ' ' || last_name), preferred_house, dormitory, game_character_id
+        INTO v_app_id, v_app_status, v_char_name, v_house, v_dormitory, v_game_char_id
+        FROM public.character_applications
+        WHERE discord_id = v_discord_id
+        ORDER BY
+            (CASE WHEN game_character_id IS NULL THEN 0 ELSE 1 END),
+            (CASE WHEN status = 'approved' THEN 0 ELSE 1 END),
+            created_at DESC
+        LIMIT 1;
+    END IF;
 
     IF v_app_id IS NULL THEN
-        RAISE EXCEPTION 'Nenhuma inscrição foi encontrada para este Discord.' USING ERRCODE = 'P0002';
+        RAISE EXCEPTION 'Nenhuma ficha correspondente a este Discord foi encontrada.' USING ERRCODE = 'P0002';
+    END IF;
+
+    IF v_game_char_id IS NOT NULL THEN
+        RAISE EXCEPTION 'Esta ficha já está vinculada a um personagem criado no jogo (#%). Crie uma nova ficha no portal para outro personagem.', v_game_char_id USING ERRCODE = '23505';
     END IF;
 
     UPDATE public.server_link_codes
     SET used_at = NOW()
     WHERE discord_id = v_discord_id
+      AND application_id = v_app_id
       AND used_at IS NULL;
 
     v_code := 'ACCIO-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 8));
-    v_expires_at := NOW() + INTERVAL '10 minutes';
+    v_expires_at := NOW() + INTERVAL '30 minutes';
 
     INSERT INTO public.server_link_codes (code, discord_id, application_id, expires_at)
     VALUES (v_code, v_discord_id, v_app_id, v_expires_at);
@@ -264,10 +289,13 @@ BEGIN
         'code', v_code,
         'expires_at', v_expires_at,
         'application_id', v_app_id,
-        'application_status', v_app_status
+        'application_status', v_app_status,
+        'character_name', v_char_name,
+        'preferred_house', v_house,
+        'dormitory', v_dormitory
     );
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.issue_server_link_code() FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.issue_server_link_code() TO authenticated;
+REVOKE ALL ON FUNCTION public.issue_server_link_code(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.issue_server_link_code(UUID) TO authenticated;

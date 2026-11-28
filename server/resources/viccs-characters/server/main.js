@@ -79,6 +79,9 @@ const wandsApi = Object.freeze({
 
 const syncApi = Object.freeze({
     isConfigured: () => supabaseBridge.isConfigured(),
+    isCreationCodeRequired: () => handlers.isCreationCodeRequired(),
+    prepareCreate: (player) => handlers.prepareCreationForPlayer(player),
+    verifyCreatorCode: (player, code) => handlers.verifyCreatorCodeForPlayer(player, code),
     syncPlayer: async (player) => {
         const session = Core.sessions.get(player);
         const character = Core.characters.active(player);

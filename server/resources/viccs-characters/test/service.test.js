@@ -66,27 +66,63 @@ test('buildCharacterSheetViewModel formats labels and wand URLs cleanly', () => 
     assert.ok(vm.wand.cutoutUrl.endsWith('/regal-blue.png'));
 });
 
+test('normalizeApplicationToProfile preserves full long backstory (>24k chars), dormitory, and wordCount', () => {
+    const longBackstory = `${'Palavra '.repeat(3500)}fim.`;
+    assert.ok(longBackstory.length > 24000);
+
+    const profile = normalizeApplicationToProfile({
+        id: 'uuid-long',
+        discord_id: '149567984597466064',
+        first_name: 'Astro',
+        last_name: 'Gowdie',
+        dormitory: 'witch',
+        character_backstory: longBackstory,
+        word_count: 3501,
+    }, defaultConfig.defaults, defaultConfig.wandHandles);
+
+    assert.equal(profile.dormitory, 'witch');
+    assert.equal(profile.wordCount, 3501);
+    assert.equal(profile.characterBackstory.length, longBackstory.length);
+    assert.ok(profile.characterBackstory.endsWith('fim.'));
+});
+
 test('buildCreatorPrefillFromApplication prioritizes first_name/last_name and supports character_name fallback', () => {
     const modern = buildCreatorPrefillFromApplication({
+        id: 'app-modern-1',
         first_name: 'Hermione',
         last_name: 'Granger',
+        dormitory: 'witch',
         preferred_house: 'gryffindor',
-    });
-    assert.deepEqual(modern, {
-        first: 'Hermione',
-        last: 'Granger',
-        preferredHouse: 'gryffindor',
-    });
+        blood_status: 'muggle-born',
+        birth_date: '1979-09-19',
+        birth_place: 'Londres',
+        patronus: 'Lontra',
+        word_count: 3104,
+        wand_wood: 'Videira',
+        wand_core: 'Coração de Dragão',
+        wand_length: '10¾ polegadas',
+        wand_flexibility: 'Flexível',
+        wand_handle: 'botanical-gold',
+    }, defaultConfig.wandHandles);
+    assert.equal(modern.applicationId, 'app-modern-1');
+    assert.equal(modern.first, 'Hermione');
+    assert.equal(modern.last, 'Granger');
+    assert.equal(modern.dormitory, 'witch');
+    assert.equal(modern.preferredHouse, 'gryffindor');
+    assert.equal(modern.preferredHouseLabel, 'Grifinória');
+    assert.equal(modern.bloodStatusLabel, 'Nascido Trouxa');
+    assert.equal(modern.wordCount, 3104);
+    assert.equal(modern.wand.handleFamily, 'Botânico');
 
     const legacy = buildCreatorPrefillFromApplication({
         character_name: 'Draco Malfoy',
         preferred_house: 'slytherin',
-    });
-    assert.deepEqual(legacy, {
-        first: 'Draco',
-        last: 'Malfoy',
-        preferredHouse: 'slytherin',
-    });
+    }, defaultConfig.wandHandles);
+    assert.equal(legacy.first, 'Draco');
+    assert.equal(legacy.last, 'Malfoy');
+    assert.equal(legacy.dormitory, 'wizard');
+    assert.equal(legacy.preferredHouse, 'slytherin');
+    assert.equal(legacy.preferredHouseLabel, 'Sonserina');
 
     assert.equal(buildCreatorPrefillFromApplication({}), null);
 });
@@ -271,5 +307,172 @@ test('viccs-characters handlers dress unaffiliated students via inventory.patch 
     } finally {
         global.PlayerManager = prevPlayerManager;
     }
+});
+
+test('viccs-characters creator code gate verifies, survives cancel without burning code, and commits on hmp:character:created', async () => {
+    const { createHandlers } = require('../server/handlers');
+    const eventMap = new Map();
+    const emittedEvents = [];
+    const clientEmits = [];
+    const consumedCodes = [];
+    const linkedApps = [];
+    const auditLogs = [];
+    let upsertedProfile = null;
+    let upsertedWand = null;
+
+    const fullLongStory = `${'Crônica ancestral de Astro Gowdie em Hogwarts. '.repeat(650)}Final da jornada.`;
+    assert.ok(fullLongStory.length > 24000);
+
+    const player = {
+        id: 88,
+        nickname: 'AstroG',
+        connected: true,
+        emit: (ev, raw) => clientEmits.push({ ev, payload: typeof raw === 'string' ? JSON.parse(raw) : raw }),
+    };
+
+    const appRows = {
+        'app-pending': {
+            id: 'app-pending',
+            status: 'pending',
+            discord_id: '149567984597466064',
+            first_name: 'Astro',
+            last_name: 'Pendente',
+            dormitory: 'wizard',
+            character_backstory: 'Ainda em revisão.',
+            word_count: 3,
+            game_character_id: null,
+        },
+        'app-approved': {
+            id: 'app-approved',
+            status: 'approved',
+            discord_id: '149567984597466064',
+            first_name: 'Astro',
+            last_name: 'Gowdie',
+            birth_date: '1989-03-14',
+            birth_place: 'Edimburgo',
+            blood_status: 'half-blood',
+            dormitory: 'wizard',
+            preferred_house: 'slytherin',
+            patronus: 'Corvo Negro',
+            wand_wood: 'Ébano',
+            wand_core: 'Fibra de Coração de Dragão',
+            wand_length: '12 polegadas',
+            wand_flexibility: 'Inflexível',
+            wand_handle: 'regal-blue',
+            character_backstory: fullLongStory,
+            word_count: 4553,
+            game_character_id: null,
+        },
+    };
+
+    const handlers = createHandlers({
+        hmp: { rateLimit: { create: () => ({ allow: () => true }) } },
+        core: { sessions: { get: () => ({ player, playerId: 88 }) }, characters: { active: () => null } },
+        houses: null,
+        viccsCore: {
+            audit: { record: async (entry) => auditLogs.push(entry) },
+            auth: {
+                isTicketBridgeConfigured: () => true,
+                getVerifiedSession: () => null,
+                previewLinkCode: async (_p, rawCode) => {
+                    const normalized = String(rawCode || '').trim().toUpperCase();
+                    if (normalized === 'VICCS-PEN-111') return { ok: true, code: normalized, discordId: '149567984597466064', applicationId: 'app-pending' };
+                    if (normalized === 'VICCS-AST-999') return { ok: true, code: normalized, discordId: '149567984597466064', applicationId: 'app-approved' };
+                    return { ok: false, reason: 'Código inválido.' };
+                },
+                consumeLinkCode: async (_p, code, opts) => {
+                    consumedCodes.push({ code, opts });
+                    return { ok: true, discordId: '149567984597466064', applicationId: 'app-approved' };
+                },
+            },
+            safeImport: () => null,
+        },
+        viccsUi: { fade: async () => true, notify: () => {}, audioCue: () => {} },
+        database: {
+            getProfile: async () => null,
+            getWand: async () => null,
+            isApplicationClaimedElsewhere: async () => false,
+            upsertProfile: async (charId, data) => {
+                upsertedProfile = { characterId: charId, ...data };
+                return upsertedProfile;
+            },
+            upsertWand: async (charId, data) => {
+                upsertedWand = { characterId: charId, ...data };
+                return upsertedWand;
+            },
+            updateRobesState: async () => ({}),
+            updateSortingResult: async () => ({}),
+            markIntroCompleted: async () => {},
+        },
+        supabaseBridge: {
+            isConfigured: () => true,
+            fetchApplicationById: async (id) => appRows[id] || null,
+            linkGameCharacter: async (payload) => {
+                linkedApps.push(payload);
+                return true;
+            },
+        },
+        config: defaultConfig,
+        events: {
+            on: (ev, fn) => eventMap.set(ev, fn),
+            onClient: (ev, fn) => eventMap.set(`client:${ev}`, fn),
+            emit: (ev, payload) => emittedEvents.push({ ev, payload }),
+        },
+        logger: { info: () => {}, warn: () => {}, error: () => {} },
+    });
+
+    handlers.registerEvents();
+
+    // 1. Sem código validado, criação deve ser barrada pelo gate autoritativo
+    const blocked = handlers.prepareCreationForPlayer(player);
+    assert.equal(blocked.ok, false);
+    assert.equal(consumedCodes.length, 0);
+
+    // 2. Ficha pending deve ser rejeitada quando requireApprovedApplication = true
+    const pendingRes = await handlers.verifyCreatorCodeForPlayer(player, 'VICCS-PEN-111');
+    assert.equal(pendingRes.ok, false);
+    assert.match(pendingRes.reason, /aprovação/i);
+    assert.equal(consumedCodes.length, 0);
+
+    // 3. Ficha approved valida com sucesso e retorna prefill completo, sem queimar o código
+    const okRes = await handlers.verifyCreatorCodeForPlayer(player, 'viccs-ast-999');
+    assert.equal(okRes.ok, true);
+    assert.equal(okRes.prefill.first, 'Astro');
+    assert.equal(okRes.prefill.last, 'Gowdie');
+    assert.equal(okRes.prefill.dormitory, 'wizard');
+    assert.equal(okRes.prefill.preferredHouse, 'slytherin');
+    assert.equal(okRes.prefill.wand.handleFamily, 'Régio');
+    assert.equal(consumedCodes.length, 0);
+
+    // 4. Cancelamento limpa estado pendente sem queimar o código, permitindo revalidar depois
+    eventMap.get('client:hmp-characters:cancelled')(player);
+    assert.equal(handlers.prepareCreationForPlayer(player).ok, false);
+    assert.equal(consumedCodes.length, 0);
+
+    const reverified = await handlers.verifyCreatorCodeForPlayer(player, 'VICCS-AST-999');
+    assert.equal(reverified.ok, true);
+    const prepared = handlers.prepareCreationForPlayer(player);
+    assert.equal(prepared.ok, true);
+    assert.equal(prepared.claim.prefill.first, 'Astro');
+
+    // 5. Confirmação real em hmp:character:created consome atomicamente, grava full backstory e vincula Supabase
+    await eventMap.get('hmp:character:created')({
+        session: { player, playerId: 88 },
+        character: { id: 902, name: 'Astro Gowdie' },
+    });
+
+    assert.equal(consumedCodes.length, 1);
+    assert.equal(consumedCodes[0].code, 'VICCS-AST-999');
+    assert.equal(consumedCodes[0].opts.expectedDiscordId, '149567984597466064');
+    assert.equal(upsertedProfile.characterId, 902);
+    assert.equal(upsertedProfile.dormitory, 'wizard');
+    assert.equal(upsertedProfile.preferredHouse, 'slytherin');
+    assert.equal(upsertedProfile.wordCount, 4553);
+    assert.equal(upsertedProfile.characterBackstory.length, fullLongStory.length);
+    assert.equal(upsertedWand.handleId, 'regal-blue');
+    assert.equal(linkedApps.length, 1);
+    assert.deepEqual(linkedApps[0], { applicationId: 'app-approved', gameCharacterId: 902 });
+    assert.equal(auditLogs.some((a) => a.action === 'character.synced_on_create'), true);
+    assert.equal(emittedEvents.some((e) => e.ev === 'viccs:auth:linked'), true);
 });
 

@@ -65,6 +65,16 @@ function createDatabase({ mysql, logger }) {
                         ADD COLUMN IF NOT EXISTS robes_applied TINYINT(1) NOT NULL DEFAULT 0 AFTER robes_house`,
                 ],
             },
+            {
+                version: 4,
+                name: 'add dormitory, preferred_house, and word_count for complete portal sync',
+                statements: [
+                    `ALTER TABLE viccs_character_profiles
+                        ADD COLUMN IF NOT EXISTS dormitory VARCHAR(16) NOT NULL DEFAULT 'wizard' AFTER blood_status,
+                        ADD COLUMN IF NOT EXISTS preferred_house VARCHAR(24) NULL AFTER patronus,
+                        ADD COLUMN IF NOT EXISTS word_count INT UNSIGNED NOT NULL DEFAULT 0 AFTER character_backstory`,
+                ],
+            },
         ]);
 
         migrated = true;
@@ -97,8 +107,8 @@ function createDatabase({ mysql, logger }) {
     async function upsertProfile(characterId, data) {
         await mysql.query(
             `INSERT INTO viccs_character_profiles
-                (character_id, supabase_application_id, discord_id, full_name, birth_date, birth_place, blood_status, academic_year, patronus, character_backstory, house, secondary_house, hatstall, sorted_at, intro_completed)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (character_id, supabase_application_id, discord_id, full_name, birth_date, birth_place, blood_status, dormitory, academic_year, patronus, preferred_house, character_backstory, word_count, house, secondary_house, hatstall, sorted_at, intro_completed)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE
                 supabase_application_id = COALESCE(VALUES(supabase_application_id), supabase_application_id),
                 discord_id = COALESCE(VALUES(discord_id), discord_id),
@@ -106,9 +116,12 @@ function createDatabase({ mysql, logger }) {
                 birth_date = VALUES(birth_date),
                 birth_place = VALUES(birth_place),
                 blood_status = VALUES(blood_status),
+                dormitory = VALUES(dormitory),
                 academic_year = VALUES(academic_year),
                 patronus = VALUES(patronus),
+                preferred_house = COALESCE(VALUES(preferred_house), preferred_house),
                 character_backstory = COALESCE(VALUES(character_backstory), character_backstory),
+                word_count = GREATEST(word_count, VALUES(word_count)),
                 house = COALESCE(VALUES(house), house),
                 secondary_house = COALESCE(VALUES(secondary_house), secondary_house),
                 hatstall = VALUES(hatstall),
@@ -122,9 +135,12 @@ function createDatabase({ mysql, logger }) {
                 data.birthDate || '',
                 data.birthPlace || 'Grã-Bretanha',
                 data.bloodStatus || 'half-blood',
+                data.dormitory === 'witch' ? 'witch' : 'wizard',
                 Number(data.academicYear) || 1,
                 data.patronus || '',
+                data.preferredHouse || null,
                 data.characterBackstory || null,
+                Number(data.wordCount) || 0,
                 data.house || null,
                 data.secondaryHouse || null,
                 data.hatstall ? 1 : 0,

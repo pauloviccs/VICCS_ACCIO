@@ -1,7 +1,8 @@
 # Active Task — VICCS Accio RP
 
 ## Estado Atual
-- **Nenhuma implementação pendente em aberto** — ciclo de correções da **Fase 2 (Imersão, Controles `Alt`/`Esc`, Vestes Iniciais e Salão Principal)** concluído e validado em bateria automatizada (`31/31` testes aprovados).
+- **Nenhuma implementação pendente em aberto** — ciclo de correções da **Fase 2 (Imersão, Controles `Alt`/`Esc`, Vestes Iniciais e Salão Principal)** concluído, versionado (`eb29533` / `v.0.1.a`) e sincronizado no Cortex `.agent/`.
+- **Verificações Recentes:** `31/31` testes em `node --test`, `33/33` `.js` (`viccs-*`) aprovados no `node --check`, `39/39` JSONs válidos e `tsc --noEmit` limpo em `website/`.
 - **Ambiente local:** `0.0.0.0:27016` (`download-url: ""` em `server/server.json`), `34` resources JS ativos (`30` `hmp-*` + `4` `viccs-*`), MariaDB `hogwartsmp` em `127.0.0.1:3306`.
 
 ## Última Entrega Verificada

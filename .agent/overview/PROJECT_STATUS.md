@@ -9,7 +9,7 @@ Servidor de Roleplay MMO-RPG ambientado no universo de Hogwarts Legacy nos anos 
 ## Tech Stack
 - Languages: JavaScript (Node.js server, V8 client e WebViews CEF), TypeScript (`~5.7.2` no `website/`), HTML5, CSS3, SQL (PostgreSQL / MariaDB), PowerShell / Batch
 - Frameworks: ArcaneMP `1.15.1` (`b8ce055`, MafiaHub Framework `44.1.1`, `ArcaneMPServer.exe`, `libnode.dll`), HMP Foundations `v0.12.0` (30 módulos `hmp-*`), Ecossistema VICCS (`viccs-core`, `viccs-ui`, `viccs-characters`, `viccs-sorting`), React 19, Vite 6, Tailwind CSS v4, Three.js
-- Tools: `Accio_Server_Manager.bat` (`server-manager.ps1` / `start-server.ps1`), `node --test` (`31` testes unitários/DOM/VM em `viccs-*/test/service.test.js`), `node --check`, `tsc --noEmit` / Vite CLI, Git / GitHub (`VICCS_ACCIO.git` + subtree `accio_rp_website.git`)
+- Tools: `Accio_Server_Manager.bat` (`server-manager.ps1` / `start-server.ps1`), `node --test` (`31` testes unitários/DOM/VM em `viccs-*/test/service.test.js`), `node --check` (`33` `.js` em `viccs-*`), validação JSON (`39` arquivos entre `viccs-*` e `server/data/`), `tsc --noEmit` / Vite CLI (`website/`), Git / GitHub (`VICCS_ACCIO.git` + subtree `accio_rp_website.git`)
 - Services: XAMPP **MariaDB `10.4.32`** (`127.0.0.1:3306`, schema `hogwartsmp` com 37 tabelas HMP + 5 tabelas `viccs_*`), **Supabase Cloud** (`ACCIO_Rp`, ref `siwjyavftankitbdagzo`, PostgreSQL 17, Auth Discord OAuth2, Storage `character_sheets`, Realtime, `server_join_tickets` / `server_link_codes` + RPC `issue_server_link_code()`), **Discord API** (OAuth2 + Webhooks)
 
 ## Folder Structure
@@ -28,7 +28,7 @@ VICCS_Accio_HL_Server/
 ├── scripts/
 │   └── migration_accio_rp.sql            # Script DDL/DML oficial do Supabase ACCIO_Rp (tabelas, RLS, Realtime, RPC)
 ├── server/                               # Servidor dedicado ArcaneMP 1.15.1 + 34 resources JS ativos
-│   ├── .agent/                           # GDD, especificação do Chapéu Seletor, regras imersivas e logs locais
+│   ├── .agent/                           # GDD, spec do Chapéu Seletor, regras imersivas, referências de sistemas e logs locais
 │   ├── .packages/                        # Pacotes compilados .fwpak/.chunks gerados no boot
 │   ├── data/                             # 31 arquivos JSON (27 hmp-*.json + 4 viccs-*.example.json)
 │   ├── logs/                             # Logs de execução (hogwarts-mp.log)
@@ -43,7 +43,7 @@ VICCS_Accio_HL_Server/
 │   ├── server-manager.ps1 / start-server.ps1 / server.json / server.example.json / README.md
 ├── supabase/                             # (Reservado) Apenas .gitkeep no momento
 ├── website/                              # Plataforma Web de Pré-Registro e Admissão (React 19 + Vite 6 + Three.js)
-│   ├── .agent/assets/                    # Referências visuais de varinhas e amostra de ficha PDF
+│   ├── .agent/assets/                    # Amostra de ficha PDF, pottermore-assets e referências visuais de varinhas
 │   ├── public/                           # assets/ (emblemas, logohigh_4x.jpg), audio/ (6 MP3s), wands/ (83 .webp + 11 cutouts PNG)
 │   └── src/                              # 15 componentes React em components/, lib/ (supabase, audio, pdf, webhook) e index.css
 ├── .gitignore
@@ -65,7 +65,7 @@ VICCS_Accio_HL_Server/
 
 ## Work in Progress / Known Gaps
 - **Validação Final Ao Vivo no Cliente Gráfico (`127.0.0.1:27016`):**
-  - Bateria automatizada local validou sintaxe (`node --check`), JSONs e `31/31` testes em `node --test` (incluindo simulações VM/DOM de `book/app.js`, atalhos `Alt`/`Esc`, uniforme `Unaffiliated` + `gear.equip` e fluxo `FT_HW_GreatHall` → Chapéu Seletor). Falta confirmar visualmente no cliente real do jogo após reiniciar o servidor.
+  - Verificação automatizada local aprovada (`33/33` `.js` no `node --check`, `39/39` `.json` válidos, `31/31` testes em `node --test` e `tsc --noEmit` limpo em `website/`), além do checkpoint versionado em `v.0.1.a` (`eb29533`). Falta confirmar visualmente em sessão ao vivo após as correções de `Alt`/`Esc`, `Unaffiliated` e `FT_HW_GreatHall`.
 - **Ativação Opcional da Ponte Supabase Local:**
   - `server/data/viccs-core.json` e `server/data/viccs-characters.json` ainda não foram criados a partir dos `.example.json` (ponte em modo local offline por padrão).
 - **Fases 3 a 6 (Planejadas):**

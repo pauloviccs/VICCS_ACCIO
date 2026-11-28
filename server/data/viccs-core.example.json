@@ -7,7 +7,7 @@
     },
     "identity": {
         "supabaseTicketValidation": false,
-        "supabaseUrl": "https://seu-projeto.supabase.co",
+        "supabaseUrl": "https://siwjyavftankitbdagzo.supabase.co",
         "supabaseServiceKey": "",
         "timeoutMs": 6000
     },

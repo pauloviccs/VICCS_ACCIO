@@ -217,3 +217,95 @@ test('buildPlayerBookSnapshot surfaces nextStep, resume sorting state, and synce
     assert.equal(ready.resources.galleons, 125);
     assert.equal(ready.recommendations.length, 0);
 });
+
+test('ticketBridge previewLinkCode checks without consuming, while consumeLinkCodeForPlayer redeems atomically', async () => {
+    const { createTicketBridge } = require('../server/ticketBridge');
+    const prevFetch = global.fetch;
+    const fetchLog = [];
+    const linkIdentityCalls = [];
+    const sessionObj = { playerId: 9, account: { id: 42 } };
+    const player = { id: 9, nickname: 'Astro' };
+
+    global.fetch = async (url, init = {}) => {
+        const method = init.method || 'GET';
+        fetchLog.push({ url, method, body: init.body ? JSON.parse(init.body) : null });
+
+        if (method === 'GET' && url.includes('server_link_codes?code=eq.VICCS-AST-777')) {
+            return {
+                ok: true,
+                json: async () => [{
+                    id: 'code-1',
+                    code: 'VICCS-AST-777',
+                    discord_id: '149567984597466064',
+                    application_id: 'app-uuid-9',
+                    expires_at: '2099-01-01T00:00:00.000Z',
+                    used_at: null,
+                }],
+            };
+        }
+        if (method === 'PATCH' && url.includes('server_link_codes?code=eq.VICCS-AST-777')) {
+            return {
+                ok: true,
+                json: async () => [{
+                    id: 'code-1',
+                    code: 'VICCS-AST-777',
+                    discord_id: '149567984597466064',
+                    application_id: 'app-uuid-9',
+                    expires_at: '2099-01-01T00:00:00.000Z',
+                    used_at: init.body ? JSON.parse(init.body).used_at : '2026-11-28T00:00:00.000Z',
+                }],
+            };
+        }
+        return { ok: true, json: async () => [] };
+    };
+
+    try {
+        const bridge = createTicketBridge({
+            core: {
+                sessions: { get: (p) => (p === player ? sessionObj : null) },
+                accounts: {
+                    linkIdentity: async (accountId, principal) => {
+                        linkIdentityCalls.push({ accountId, principal });
+                        return true;
+                    },
+                },
+            },
+            config: {
+                identity: {
+                    supabaseTicketValidation: true,
+                    supabaseUrl: 'https://example.supabase.co',
+                    supabaseServiceKey: 'service-key-test',
+                    timeoutMs: 3000,
+                },
+            },
+            logger: { warn: () => {}, info: () => {} },
+        });
+
+        const preview = await bridge.previewLinkCode(player, 'viccs-ast-777');
+        assert.equal(preview.ok, true);
+        assert.equal(preview.code, 'VICCS-AST-777');
+        assert.equal(preview.discordId, '149567984597466064');
+        assert.equal(preview.applicationId, 'app-uuid-9');
+        assert.equal(fetchLog.filter((f) => f.method === 'PATCH').length, 0);
+        assert.equal(linkIdentityCalls.length, 0);
+
+        const wrongDiscord = await bridge.consumeLinkCodeForPlayer(player, 'VICCS-AST-777', {
+            expectedDiscordId: '999999999',
+        });
+        assert.equal(wrongDiscord.ok, false);
+        assert.equal(fetchLog.filter((f) => f.method === 'PATCH').length, 0);
+
+        const consumed = await bridge.consumeLinkCodeForPlayer(player, 'VICCS-AST-777', {
+            expectedDiscordId: '149567984597466064',
+        });
+        assert.equal(consumed.ok, true);
+        assert.equal(consumed.applicationId, 'app-uuid-9');
+        assert.equal(fetchLog.filter((f) => f.method === 'PATCH').length, 1);
+        assert.equal(linkIdentityCalls.length, 1);
+        assert.equal(linkIdentityCalls[0].accountId, 42);
+        assert.equal(linkIdentityCalls[0].principal.subject, '149567984597466064');
+        assert.equal(bridge.getVerifiedSession(player).applicationId, 'app-uuid-9');
+    } finally {
+        global.fetch = prevFetch;
+    }
+});

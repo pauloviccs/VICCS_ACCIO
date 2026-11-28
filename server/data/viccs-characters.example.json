@@ -2,6 +2,8 @@
     "$description": "Override opcional do viccs-characters. Copie para server/data/viccs-characters.json e nunca comite chaves privadas.",
     "featureToggles": {
         "supabaseSync": false,
+        "requireCreationCode": true,
+        "requireApprovedApplication": true,
         "autoApplyHouseFromWhitelist": false,
         "requireWhitelistVerification": false,
         "allowAssertedDiscordInDev": true,
@@ -16,7 +18,7 @@
         "backItemId": "Back_001_Basic"
     },
     "supabase": {
-        "url": "https://seu-projeto.supabase.co",
+        "url": "https://siwjyavftankitbdagzo.supabase.co",
         "serviceRoleKey": "",
         "timeoutMs": 6000
     }

@@ -54,11 +54,12 @@ function renderSheet(vm) {
     document.getElementById('char-subtitle').textContent = `${vm.houseLabel || ''} · ${vm.academicYear || 1}º Ano`;
     document.getElementById('val-house').textContent = vm.houseLabel || '-';
     document.getElementById('val-year').textContent = `${vm.academicYear || 1}º Ano`;
+    document.getElementById('val-dormitory').textContent = vm.dormitoryLabel || '-';
     document.getElementById('val-blood').textContent = vm.bloodStatusLabel || '-';
     document.getElementById('val-birth').textContent = vm.birthPlace || '-';
     document.getElementById('val-patronus').textContent = vm.patronus || 'Não manifestado';
     document.getElementById('val-id').textContent = `#${String(vm.characterId || 0).padStart(4, '0')}`;
-    document.getElementById('val-backstory').textContent = vm.backstoryExcerpt || '-';
+    document.getElementById('val-backstory').textContent = vm.fullBackstory || vm.backstoryExcerpt || '-';
 
     const wand = vm.wand || {};
     document.getElementById('wand-wood').textContent = wand.wood || '-';

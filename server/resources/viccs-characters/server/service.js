@@ -18,6 +18,11 @@ const HOUSE_LABELS = Object.freeze({
     hufflepuff: 'Lufa-Lufa',
 });
 
+const DORMITORY_LABELS = Object.freeze({
+    wizard: 'Bruxo (Ala Masculina)',
+    witch: 'Bruxa (Ala Feminina)',
+});
+
 /**
  * Resolve uma opção de cabo de varinha pelo ID, com fallback para o catálogo.
  * @param {string} handleId
@@ -46,8 +51,12 @@ function normalizeApplicationToProfile(app, configDefaults = {}, handles = []) {
     if (!app || typeof app !== 'object') return null;
 
     const blood = BLOOD_LABELS[app.blood_status] ? app.blood_status : (configDefaults.defaultBloodStatus || 'half-blood');
+    const dormitory = app.dormitory === 'witch' ? 'witch' : 'wizard';
     const handle = resolveWandHandle(app.wand_handle || configDefaults.defaultWand?.handleId, handles);
     const fullName = [app.first_name, app.last_name].filter(Boolean).join(' ').trim();
+    const backstory = app.character_backstory ? String(app.character_backstory).slice(0, 100000) : '';
+    const computedWords = backstory ? backstory.trim().split(/\s+/).filter(Boolean).length : 0;
+    const wordCount = Math.max(0, Math.trunc(Number(app.word_count)) || computedWords);
 
     return {
         supabaseApplicationId: app.id ? String(app.id) : null,
@@ -56,9 +65,11 @@ function normalizeApplicationToProfile(app, configDefaults = {}, handles = []) {
         birthDate: app.birth_date ? String(app.birth_date).slice(0, 32) : '',
         birthPlace: app.birth_place ? String(app.birth_place).slice(0, 80) : (configDefaults.defaultBirthPlace || ''),
         bloodStatus: blood,
+        dormitory,
         preferredHouse: HOUSE_LABELS[app.preferred_house] ? app.preferred_house : null,
         patronus: app.patronus ? String(app.patronus).slice(0, 80) : '',
-        characterBackstory: app.character_backstory ? String(app.character_backstory).slice(0, 24000) : '',
+        characterBackstory: backstory,
+        wordCount,
         wand: {
             wood: String(app.wand_wood || configDefaults.defaultWand?.wood || 'Carvalho Inglês').slice(0, 64),
             core: String(app.wand_core || configDefaults.defaultWand?.core || 'Pena de Fênix').slice(0, 80),
@@ -79,6 +90,7 @@ function buildCharacterSheetViewModel({ character, profile, wand, house, handles
     const backstoryExcerpt = rawStory
         ? (rawStory.length > 650 ? `${rawStory.slice(0, 650).trim()}...` : rawStory)
         : 'Crônica registrada aguardando sincronização ministerial.';
+    const dormitory = profile?.dormitory === 'witch' ? 'witch' : 'wizard';
 
     return {
         initialTab: initialTab === 'wand' ? 'wand' : 'sheet',
@@ -89,10 +101,14 @@ function buildCharacterSheetViewModel({ character, profile, wand, house, handles
         academicYear: Number(profile?.academicYear || profile?.academic_year || 1),
         bloodStatus: profile?.bloodStatus || profile?.blood_status || 'half-blood',
         bloodStatusLabel: BLOOD_LABELS[profile?.bloodStatus || profile?.blood_status] || 'Mestiço',
+        dormitory,
+        dormitoryLabel: DORMITORY_LABELS[dormitory] || 'Bruxo (Ala Masculina)',
         birthDate: profile?.birthDate || profile?.birth_date || 'Não informado',
         birthPlace: profile?.birthPlace || profile?.birth_place || 'Grã-Bretanha',
         patronus: profile?.patronus || 'Não manifestado',
         hatstall: Boolean(profile?.hatstall),
+        wordCount: Number(profile?.wordCount || profile?.word_count || 0),
+        fullBackstory: rawStory || 'Crônica registrada aguardando sincronização ministerial.',
         backstoryExcerpt,
         wand: {
             wood: wand?.wood || 'Carvalho Inglês',
@@ -110,9 +126,9 @@ function buildCharacterSheetViewModel({ character, profile, wand, house, handles
 }
 
 /**
- * Extrai nome/sobrenome aprovados no Supabase suportando first_name/last_name e character_name legado.
+ * Extrai nome/sobrenome/dormitório e resumo completo da ficha aprovada no Supabase para o criador 3D.
  */
-function buildCreatorPrefillFromApplication(approved) {
+function buildCreatorPrefillFromApplication(approved, handles = []) {
     if (!approved || typeof approved !== 'object') return null;
 
     let first = String(approved.first_name || '').trim();
@@ -128,10 +144,34 @@ function buildCreatorPrefillFromApplication(approved) {
     last = last.slice(0, 32);
     if (!first && !last) return null;
 
+    const dormitory = approved.dormitory === 'witch' ? 'witch' : 'wizard';
+    const handle = resolveWandHandle(approved.wand_handle, handles);
+    const blood = BLOOD_LABELS[approved.blood_status] || 'Mestiço';
+    const preferredHouseLabel = HOUSE_LABELS[approved.preferred_house] || null;
+    const rawStory = String(approved.character_backstory || '').trim();
+    const wordCount = Math.max(0, Math.trunc(Number(approved.word_count)) || (rawStory ? rawStory.split(/\s+/).filter(Boolean).length : 0));
+
     return {
+        applicationId: approved.id ? String(approved.id) : null,
         first,
         last,
+        dormitory,
         preferredHouse: approved.preferred_house || null,
+        preferredHouseLabel,
+        bloodStatus: approved.blood_status || 'half-blood',
+        bloodStatusLabel: blood,
+        birthDate: approved.birth_date || '',
+        birthPlace: approved.birth_place || 'Grã-Bretanha',
+        patronus: approved.patronus || 'Em despertar interior',
+        wordCount,
+        wand: {
+            wood: approved.wand_wood || 'Carvalho Inglês',
+            core: approved.wand_core || 'Pena de Fênix',
+            length: approved.wand_length || '11 polegadas',
+            flexibility: approved.wand_flexibility || 'Firme',
+            handleName: handle.name,
+            handleFamily: handle.family,
+        },
     };
 }
 
@@ -238,6 +278,7 @@ function planHouseRobePatch({
 module.exports = {
     BLOOD_LABELS,
     HOUSE_LABELS,
+    DORMITORY_LABELS,
     resolveWandHandle,
     normalizeApplicationToProfile,
     buildCharacterSheetViewModel,

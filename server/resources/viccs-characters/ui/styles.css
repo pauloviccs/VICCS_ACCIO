@@ -133,13 +133,21 @@
     color: var(--color-subtle);
 }
 
+.backstory-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
 .backstory-box p {
     font-family: var(--font-crimson);
     font-size: 15px;
     line-height: 1.55;
     color: var(--color-muted);
-    max-height: 110px;
+    max-height: 165px;
     overflow-y: auto;
+    white-space: pre-line;
 }
 
 .wand-layout {

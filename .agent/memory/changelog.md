@@ -1,5 +1,15 @@
 # Changelog — VICCS Accio HL Server
 
+## [0.3.4] — 2026-11-27
+
+### Sincronização Completa de Overview, Memória & Schema
+- **Cortex `.agent/` & `README.md`:**
+  - Consolidado o estado pós-checkpoint `v.0.1.a` (`eb29533`) em `.agent/overview/PROJECT_STATUS.md`, `.agent/memory/active_task.md`, `.agent/memory/todos.md` e `README.md`.
+  - Integrada a migração v3 de `viccs_character_profiles` (`robes_house`, `robes_applied`) diretamente na listagem de tabelas de `.agent/context/database_schema.md`.
+  - **Verificação:** `31/31` testes em `node --test`, `33/33` arquivos `.js` (`viccs-*`) no `node --check`, `39/39` JSONs válidos e `npx tsc --noEmit` aprovado em `website/`.
+
+---
+
 ## [0.3.3] — 2026-11-27
 
 ### Correções de Runtime ao Vivo (Fase 2): `Alt`, `Esc`, Salão Principal e Vestes Iniciais
